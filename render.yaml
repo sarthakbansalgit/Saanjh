@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: saanjh-matrimony
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: "npm install && npm run build && cd backend && npm install"
+    startCommand: "node backend/index.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false   # You will paste your Atlas URI in Render dashboard
+      - key: JWT_SECRET
+        sync: false   # You will set a strong secret in Render dashboard
