@@ -17,7 +17,7 @@ const Navbar = () => {
 
           <nav id="navbar" className={`navbar ${isMobileNavOpen ? 'navbar-mobile' : ''}`}>
             <ul>
-              <li><Link className="nav-link scrollto active" to="/">Home</Link></li>
+              <li><Link className="nav-link scrollto active" to="/" onClick={() => setIsMobileNavOpen(false)}>Home</Link></li>
               <li><a className="nav-link scrollto" href="#about" onClick={() => setIsMobileNavOpen(false)}>About Us</a></li>
               {/* <li><a className="nav-link scrollto" href="/Services">Services</a></li> */}
               <li><a className="nav-link scrollto" href="#success" onClick={() => setIsMobileNavOpen(false)}>Success stories</a></li>
@@ -38,9 +38,9 @@ const Navbar = () => {
               <li><a href="#">Drop Down 4</a></li>
             </ul>
           </li> */}
-              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/login">Login</Link></li>
-              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/signup">Sign Up</Link></li>
-              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/admin">Admin</Link></li>
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "#fff" }} to="/login" onClick={() => setIsMobileNavOpen(false)}>Login</Link></li>
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "#fff" }} to="/signup" onClick={() => setIsMobileNavOpen(false)}>Sign Up</Link></li>
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "#fff" }} to="/admin" onClick={() => setIsMobileNavOpen(false)}>Admin</Link></li>
             </ul>
             <i
               className={`bi mobile-nav-toggle ${isMobileNavOpen ? 'bi-x' : 'bi-list'}`}
