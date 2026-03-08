@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
@@ -346,7 +345,7 @@ h6,
 #hero {
   width: 100%;
   height: 70vh;
-  background: #fef8f5;
+  background: radial-gradient(circle at center, #fff6e5 0%, #fffdf9 100%);
   border-bottom: 2px solid #fcebe3;
   margin: 72px 0 -72px 0;
 }
@@ -1359,14 +1358,14 @@ section {
 
 
 
-.send-otp{
+.send-otp {
   display: flex;
   flex-direction: column;
   padding-bottom: 20px;
   text-align: center;
 }
 
-.send-otp input{
+.send-otp input {
   width: 300px;
   margin-left: 15px;
   text-align: center;
