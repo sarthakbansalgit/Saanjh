@@ -94,6 +94,10 @@ const UserSchema = new Schema({
     date: { type: String },
     count: { type: Number, default: 0 }
   },
+  dailyInterests: {
+    date: { type: String },
+    count: { type: Number, default: 0 }
+  },
 
   date: {
     type: Date,

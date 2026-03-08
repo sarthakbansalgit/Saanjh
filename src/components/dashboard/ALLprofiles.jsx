@@ -17,6 +17,8 @@ const ALLprofiles = () => {
     const [minAge, setMinAge] = useState('');
     const [maxAge, setMaxAge] = useState('');
     const [cityFilter, setCityFilter] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeTab, setActiveTab] = useState('all'); // 'all', 'liked', 'matches'
 
     useEffect(() => {
         getUser();
@@ -62,33 +64,111 @@ const ALLprofiles = () => {
         }
     };
 
+    const [toast, setToast] = useState(null);
+
+    const showToast = (msg, type = 'info') => {
+        setToast({ msg, type });
+        setTimeout(() => setToast(null), 3500);
+    };
+
+    const isPremiumActive = () => {
+        if (!me?.plan || me.plan === 'free') return false;
+        if (!me.planExpiry) return false;
+        return new Date() < new Date(me.planExpiry);
+    };
+
     const handleSendInterest = async (targetEmail) => {
-        if (!me) return alert("Please log in first");
+        if (!me) return showToast("Please log in first", 'error');
         try {
             const res = await axios.post(`http://localhost:5001/auth/sendinterest`, { targetEmail }, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
-            alert(res.data.message);
+            if (res.data.matched) {
+                showToast(res.data.message, 'success');
+            } else {
+                showToast(res.data.message || 'Interest sent!', res.data.success ? 'success' : 'error');
+            }
             getUser();
         } catch (err) {
-            console.error(err);
-            alert("Error sending interest.");
+            showToast("Error sending interest.", 'error');
         }
+    };
+
+    const handleRejectInterest = async (targetEmail) => {
+        try {
+            await axios.post(`http://localhost:5001/auth/rejectinterest`, { targetEmail }, {
+                headers: { "auth-token": localStorage.getItem('token') }
+            });
+            showToast("Interest rejected.", 'info');
+            getUser();
+        } catch (err) {
+            showToast("Error rejecting interest.", 'error');
+        }
+    };
+
+    const handleChatClick = (email) => {
+        if (!isPremiumActive()) {
+            showToast("💎 Upgrade to Premium to chat with your matches!", 'error');
+            return;
+        }
+        navigate('/messages');
     };
 
     const filteredUsers = allusers.filter(u => {
         if (me && u.email === me.email) return false;
+
+        // Tab Filtering logic
+        const isMatched = me?.matches?.includes(u.email);
+        const hasReceived = me?.interestsReceived?.includes(u.email);
+
+        if (activeTab === 'matches') {
+            if (!isMatched) return false;
+        } else if (activeTab === 'liked') {
+            if (!hasReceived || isMatched) return false;
+        } else {
+            // "All Profiles" tab - usually hide matched people to "move" them
+            if (isMatched) return false;
+        }
+
+        // Search Filters
         if (genderFilter && u.gender && u.gender.toLowerCase() !== genderFilter.toLowerCase()) return false;
         if (minAge && u.age && parseInt(u.age) < parseInt(minAge)) return false;
         if (maxAge && u.age && parseInt(u.age) > parseInt(maxAge)) return false;
         if (cityFilter && u.district && !u.district.toLowerCase().includes(cityFilter.toLowerCase())) return false;
+
+        // Text Search Query
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const matchesSearch = (
+                u.name?.toLowerCase().includes(q) ||
+                u.caste?.toLowerCase().includes(q) ||
+                u.religion?.toLowerCase().includes(q) ||
+                u.education?.toLowerCase().includes(q) ||
+                u.district?.toLowerCase().includes(q)
+            );
+            if (!matchesSearch) return false;
+        }
+
         return true;
     });
 
-    const isFree = !me?.plan || me?.plan === "free";
+    const isFree = !me?.plan || me?.plan === "free" || !isPremiumActive();
 
     return (
         <div className="main-panel" style={{ width: "100%" }}>
+            {/* Toast Notification */}
+            {toast && (
+                <div style={{
+                    position: "fixed", top: "80px", right: "20px", zIndex: 9999,
+                    padding: "14px 24px", borderRadius: "15px", fontWeight: "600", fontSize: "14px",
+                    background: toast.type === 'success' ? "#10b981" : toast.type === 'error' ? "#ef4444" : "#6366f1",
+                    color: "white", boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+                    animation: "slideIn 0.3s ease"
+                }}>
+                    {toast.msg}
+                </div>
+            )}
+
             <div className="content-wrapper">
 
                 {/* Header Section */}
@@ -108,6 +188,50 @@ const ALLprofiles = () => {
                     </div>
                 </div>
 
+                {/* Tab Navigation */}
+                <div className="row mb-3">
+                    <div className="col-12">
+                        <div style={{ display: "flex", gap: "10px", borderBottom: "1px solid #eee", paddingBottom: "10px" }}>
+                            {[
+                                { id: 'all', label: 'All Profiles', icon: '👥' },
+                                { id: 'liked', label: 'Liked You', icon: '💖', count: me?.interestsReceived?.length },
+                                { id: 'matches', label: 'Matches', icon: '💞', count: me?.matches?.length }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    style={{
+                                        padding: "10px 20px",
+                                        borderRadius: "30px",
+                                        border: "none",
+                                        background: activeTab === tab.id ? "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" : "transparent",
+                                        color: activeTab === tab.id ? "white" : "#666",
+                                        fontWeight: "600",
+                                        fontSize: "14px",
+                                        transition: "all 0.3s ease",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        boxShadow: activeTab === tab.id ? "0 5px 15px rgba(251, 111, 146, 0.3)" : "none"
+                                    }}
+                                >
+                                    <span>{tab.icon}</span>
+                                    {tab.label}
+                                    {tab.count > 0 && (
+                                        <span style={{
+                                            background: activeTab === tab.id ? "white" : "var(--deep-pink)",
+                                            color: activeTab === tab.id ? "var(--deep-pink)" : "white",
+                                            padding: "2px 8px", borderRadius: "10px", fontSize: "11px", marginLeft: "5px"
+                                        }}>
+                                            {tab.count}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
                 {/* Filter Bar */}
                 <div className="row mb-4">
                     <div className="col-12">
@@ -123,6 +247,17 @@ const ALLprofiles = () => {
                             <input type="number" placeholder="Min Age" value={minAge} onChange={(e) => setMinAge(e.target.value)} style={{ padding: "8px 15px", borderRadius: "15px", border: "1px solid #ddd", background: "#fff", flex: 1, minWidth: "100px" }} />
                             <input type="number" placeholder="Max Age" value={maxAge} onChange={(e) => setMaxAge(e.target.value)} style={{ padding: "8px 15px", borderRadius: "15px", border: "1px solid #ddd", background: "#fff", flex: 1, minWidth: "100px" }} />
                             <input type="text" placeholder="City/District" value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} style={{ padding: "8px 15px", borderRadius: "15px", border: "1px solid #ddd", background: "#fff", flex: 2, minWidth: "200px" }} />
+
+                            <div style={{ width: "100%", position: "relative", marginTop: "10px" }}>
+                                <span style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#888" }}>🔍</span>
+                                <input
+                                    type="text"
+                                    placeholder="Search by Name, Caste, Religion, Education..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ width: "100%", padding: "10px 15px 10px 45px", borderRadius: "15px", border: "1px solid #ddd", background: "#fff", fontSize: "14px" }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,31 +314,52 @@ const ALLprofiles = () => {
                                         <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "14px" }}>📍 {userCard.district || '—'}, {userCard.state || '—'}</p>
                                         <p style={{ margin: "0 0 15px 0", color: "#666", fontSize: "14px" }}>💼 {userCard.working || 'Not Specified'} • {userCard.education || 'Not Specified'}</p>
 
-                                        <div className="d-flex justify-content-between pt-3" style={{ borderTop: "1px solid #eee" }}>
+                                        <div className="d-flex justify-content-between pt-3" style={{ borderTop: "1px solid #eee", gap: "8px" }}>
                                             <button
                                                 className="btn btn-sm"
-                                                style={{ borderRadius: "20px", padding: "6px 16px", fontWeight: "bold", border: "2px solid var(--deep-pink)", color: "var(--deep-pink)", background: "white" }}
+                                                style={{ borderRadius: "20px", padding: "6px 14px", fontWeight: "bold", border: "2px solid var(--deep-pink)", color: "var(--deep-pink)", background: "white" }}
                                                 onClick={() => handleViewProfile(userCard)}
                                             >
-                                                View Profile
+                                                View
                                             </button>
 
-                                            {!isMatched ? (
+                                            {isMatched ? (
+                                                // MATCHED — show Chat button (locked if free)
                                                 <button
                                                     className="btn btn-sm"
-                                                    style={{ background: hasSent ? "#ccc" : "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white", borderRadius: "20px", padding: "6px 16px", fontWeight: "bold", border: "none" }}
+                                                    style={{ background: isPremiumActive() ? "linear-gradient(135deg, #10b981, #059669)" : "#9ca3af", color: "white", borderRadius: "20px", padding: "6px 14px", fontWeight: "bold", border: "none", flex: 1 }}
+                                                    onClick={() => handleChatClick(userCard.email)}
+                                                    title={!isPremiumActive() ? "Upgrade to Premium to chat" : ""}
+                                                >
+                                                    {isPremiumActive() ? "💬 Chat" : "🔒 Chat (Premium)"}
+                                                </button>
+                                            ) : hasReceived ? (
+                                                // They sent me interest — show Accept + Reject
+                                                <>
+                                                    <button
+                                                        className="btn btn-sm"
+                                                        style={{ background: "linear-gradient(135deg, #10b981, #059669)", color: "white", borderRadius: "20px", padding: "6px 12px", fontWeight: "bold", border: "none", flex: 1 }}
+                                                        onClick={() => handleSendInterest(userCard.email)}
+                                                    >
+                                                        ✅ Accept
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm"
+                                                        style={{ background: "#ef4444", color: "white", borderRadius: "20px", padding: "6px 12px", fontWeight: "bold", border: "none" }}
+                                                        onClick={() => handleRejectInterest(userCard.email)}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                // Not matched — Send Interest button
+                                                <button
+                                                    className="btn btn-sm"
+                                                    style={{ background: hasSent ? "#d1d5db" : "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: hasSent ? "#555" : "white", borderRadius: "20px", padding: "6px 14px", fontWeight: "bold", border: "none", flex: 1 }}
                                                     onClick={() => handleSendInterest(userCard.email)}
                                                     disabled={hasSent}
                                                 >
-                                                    {hasReceived ? "✅ Accept Interest" : (hasSent ? "✓ Interest Sent" : "💌 Send Interest")}
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    className="btn btn-sm"
-                                                    style={{ background: "#10b981", color: "white", borderRadius: "20px", padding: "6px 16px", fontWeight: "bold", border: "none" }}
-                                                    onClick={() => navigate('/messages')}
-                                                >
-                                                    💬 Message
+                                                    {hasSent ? "✓ Sent" : "💌 Interest"}
                                                 </button>
                                             )}
                                         </div>

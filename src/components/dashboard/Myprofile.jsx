@@ -115,7 +115,7 @@ const Myprofile = () => {
                                 <div className="col-md-6 mb-3"><p><strong>DOB: </strong> {user.dob}</p></div>
                                 <div className="col-md-6 mb-3"><p><strong>Caste: </strong> {user.caste}</p></div>
                                 <div className="col-md-6 mb-3"><p><strong>Location: </strong> {user.district}, {user.state}</p></div>
-                                <div className="col-md-6 mb-3"><p><strong>Height: </strong> {user.height} inches</p></div>
+                                <div className="col-md-6 mb-3"><p><strong>Height: </strong> {user.height} cm</p></div>
                                 <div className="col-md-6 mb-3"><p><strong>Weight: </strong> {user.weight} kg</p></div>
                                 <div className="col-md-6 mb-3"><p><strong>Education: </strong> {user.education}</p></div>
                                 <div className="col-md-6 mb-3"><p><strong>Working Sector: </strong> {user.working}</p></div>
@@ -131,7 +131,7 @@ const Myprofile = () => {
                                     <div className="input-box"><span className="details">Caste</span><input type="text" name="caste" value={formData.caste || ''} onChange={handleInputChange} /></div>
                                     <div className="input-box"><span className="details">State</span><input type="text" name="state" value={formData.state || ''} onChange={handleInputChange} /></div>
                                     <div className="input-box"><span className="details">District</span><input type="text" name="district" value={formData.district || ''} onChange={handleInputChange} /></div>
-                                    <div className="input-box"><span className="details">Height (in)</span><input type="text" name="height" value={formData.height || ''} onChange={handleInputChange} /></div>
+                                    <div className="input-box"><span className="details">Height (cm)</span><input type="number" name="height" value={formData.height || ''} onChange={handleInputChange} /></div>
                                     <div className="input-box"><span className="details">Weight (kg)</span><input type="text" name="weight" value={formData.weight || ''} onChange={handleInputChange} /></div>
                                     <div className="input-box">
                                         <span className="details">Education</span>

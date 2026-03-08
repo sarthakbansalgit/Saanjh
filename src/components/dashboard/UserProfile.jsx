@@ -67,7 +67,7 @@ const UserProfile = ({ user, isFree }) => {
 
           <h4 style={{ color: "var(--primary-pink)", borderBottom: "1px solid rgba(251, 111, 146, 0.3)", paddingBottom: "10px", margin: "15px 0" }}>Physical Attributes</h4>
           <div className="row">
-            <div className="col-md-6"><p><b>Height:</b> {user.height} inches</p></div>
+            <div className="col-md-6"><p><b>Height:</b> {user.height} cm</p></div>
             <div className="col-md-6"><p><b>Weight:</b> {user.weight} kg</p></div>
           </div>
         </div>

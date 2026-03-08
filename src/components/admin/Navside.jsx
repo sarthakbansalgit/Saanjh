@@ -4,11 +4,11 @@ import userImage from '../dashboard/img/user.png'
 const Navside = (props) => {
   return (
     <>
-    
-    
-    
 
-    <nav className="sidebar sidebar-offcanvas" id="sidebar">
+
+
+
+      <nav className="sidebar sidebar-offcanvas" id="sidebar">
         <div className="user-profile">
           <div className="user-image">
 
@@ -16,16 +16,16 @@ const Navside = (props) => {
 
           </div>
           <div className="user-name">
-            Sanika
+            Sarthak
           </div>
 
         </div>
         <ul className="nav text-center">
 
- 
+
 
           <li className="nav-item text-center">
-              <button onClick={props.handleLogout} className='btn btn-outline-secondary nav-link'>Logout</button>
+            <button onClick={props.handleLogout} className='btn btn-outline-secondary nav-link'>Logout</button>
           </li>
 
 
@@ -33,8 +33,8 @@ const Navside = (props) => {
         </ul>
 
       </nav>
-    
-    
+
+
     </>
   )
 }

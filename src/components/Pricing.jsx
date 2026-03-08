@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from './fcomponents/Navbar';
 import Footer from './fcomponents/Footer';
 import { useNavigate } from 'react-router-dom';
+import logo from '../saanjh-logo.jpg';
 
 const Pricing = () => {
     const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Pricing = () => {
 
             <div className="container py-5">
                 <div className="text-center mb-5">
+                    <img src={logo} alt="Saanjh" style={{ height: "90px", objectFit: "contain", marginBottom: "16px" }} />
                     <h1 style={{ color: "var(--deep-pink)", fontFamily: "'Playfair Display', serif", fontWeight: "bold" }}>Choose Your Plan</h1>
                     <p className="text-muted" style={{ fontSize: "18px" }}>Unlock premium features to find your life partner faster.</p>
                 </div>

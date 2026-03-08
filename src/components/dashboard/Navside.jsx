@@ -72,7 +72,7 @@ const Navside = (props) => {
           </li>
 
           <li className="nav-item">
-            <a className="nav-link" href="/searchprofile">
+            <a className="nav-link" href="/">
               <span className="menu-title">Search Profiles</span>
             </a>
           </li>

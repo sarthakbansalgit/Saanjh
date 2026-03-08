@@ -2,10 +2,8 @@ import React from 'react';
 import Navbardash from './dashboard/Navbardash';
 import Navside from './dashboard/Navside';
 import Footer from './dashboard/Footer';
-import { useNavigate } from 'react-router-dom';
 
 const DashboardLayout = ({ children }) => {
-    const navigate = useNavigate();
 
     const handleLogout = () => {
         localStorage.removeItem("token");

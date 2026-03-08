@@ -1,26 +1,25 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import logo from './fimages/saanjh-logo.jpg'
 
 const Navbar = () => {
   return (
     <>
+      <header id="header" className="fixed-top d-flex align-items-center">
+        <div className="container d-flex align-items-center justify-content-between">
 
-
-      <header id="header" class="fixed-top d-flex align-items-center">
-        <div class="container d-flex align-items-center justify-content-between">
-
-          <div class="logo">
-            <h1 class="text-light"><Link to="/"><span>Saanjh</span></Link></h1>
-            {/* <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>--> */}
+          <div className="logo" style={{ lineHeight: 1 }}>
+            <Link to="/" style={{ display: "inline-block", background: "#fff", borderRadius: "12px", padding: "4px 10px", boxShadow: "0 2px 12px rgba(0,0,0,0.12)" }}>
+              <img src={logo} alt="Saanjh" style={{ height: "65px", width: "auto", objectFit: "contain", display: "block" }} />
+            </Link>
           </div>
 
           <nav id="navbar" class="navbar">
             <ul>
-              <li><a class="nav-link scrollto active" href="/">Home</a></li>
-              <li><a class="nav-link scrollto" href="#about" >About Us</a></li>
-              {/* <li><a class="nav-link scrollto" href="/Services">Services</a></li> */}
-              <li><a class="nav-link scrollto" href="#success">Success stories</a></li>
+              <li><a className="nav-link scrollto active" href="/">Home</a></li>
+              <li><a className="nav-link scrollto" href="#about" >About Us</a></li>
+              {/* <li><a className="nav-link scrollto" href="/Services">Services</a></li> */}
+              <li><a className="nav-link scrollto" href="#success">Success stories</a></li>
               {/* <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="#">Drop Down 1</a></li>
@@ -38,10 +37,9 @@ const Navbar = () => {
               <li><a href="#">Drop Down 4</a></li>
             </ul>
           </li> */}
-              <li><Link class="getstarted scrollto" to="/login">Login</Link></li>
-              <li><Link class="getstarted scrollto" to="/admin">Admin</Link></li>
-
-
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/login">Login</Link></li>
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/signup">Sign Up</Link></li>
+              <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/admin">Admin</Link></li>
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
           </nav>

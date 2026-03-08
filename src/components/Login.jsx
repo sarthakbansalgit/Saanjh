@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import Navbar from './fcomponents/Navbar';
 import Footer from './fcomponents/Footer';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
+import logo from '../saanjh-logo.jpg';
 
 const Login = () => {
     const [creds, setCreds] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
-    const navigate = useNavigate();
 
     const onChange = (e) => {
         setCreds({ ...creds, [e.target.name]: e.target.value });
@@ -49,6 +49,7 @@ const Login = () => {
 
                         {/* Header Box */}
                         <div className="text-center py-4" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white" }}>
+                            <img src={logo} alt="Saanjh" style={{ height: "80px", objectFit: "contain", marginBottom: "10px", filter: "brightness(1.05)" }} />
                             <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: "bold", margin: 0 }}>Welcome Back</h2>
                             <p className="mb-0 mt-2" style={{ opacity: 0.9 }}>Sign in to continue your journey</p>
                         </div>

@@ -663,12 +663,15 @@ router.post('/viewprofile/:targetId', fetchuser, async (req, res) => {
         const today = new Date().toISOString().slice(0, 10);
         if (!user.dailyViews || user.dailyViews.date !== today) {
             // Reset limit counter for the new day
-            user.dailyViews = { date: today, count: 1 };
+            user.dailyViews.date = today;
+            user.dailyViews.count = 1;
+            user.markModified('dailyViews');
         } else {
             if (user.dailyViews.count >= 10) {
                 return res.json({ success: false, allowed: false, message: "Free users can only view 10 profiles a day. Upgrade to Premium!" });
             }
             user.dailyViews.count += 1;
+            user.markModified('dailyViews');
         }
         await user.save();
 
@@ -711,7 +714,26 @@ router.post('/gopremium', fetchuser, async (req, res) => {
     }
 });
 
-// **** Send Interest Logic
+// ─── Helper: Check if user has an active (non-expired) premium plan ────────────
+const isPremiumActive = (user) => {
+    if (!user.plan || user.plan === 'free') return false;
+    if (!user.planExpiry) return false;
+    if (new Date() > new Date(user.planExpiry)) return false;
+    return true;
+};
+
+// ─── Helper: Auto-expire plan if overdue ─────────────────────────────────────
+const autoExpirePlan = async (user) => {
+    if (user.plan && user.plan !== 'free' && user.planExpiry && new Date() > new Date(user.planExpiry)) {
+        user.plan = 'free';
+        user.planExpiry = null;
+        await user.save();
+    }
+};
+
+// **** Send / Accept Interest Logic ──────────────────────────────────────────
+// If target already sent me interest → this acts as "Accept" → creates Match
+// If fresh → just sends interest
 router.post('/sendinterest', fetchuser, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -722,34 +744,99 @@ router.post('/sendinterest', fetchuser, async (req, res) => {
 
         if (!target) return res.json({ success: false, message: "User not found" });
 
-        // Check if mutual match exists already
+        await autoExpirePlan(me);
+
+        // Already matched
         if (me.matches && me.matches.includes(targetEmail)) {
             return res.json({ success: false, message: "You are already matched!" });
         }
 
-        // Add to sent
-        if (!me.interestsSent.includes(targetEmail)) {
-            me.interestsSent.push(targetEmail);
-            await me.save();
+        // ── Daily interest limit by plan ──────────────────────────────────────
+        const today = new Date().toISOString().slice(0, 10);
+        let dailyLimit = 0; // free = 3
+        if (!isPremiumActive(me)) {
+            dailyLimit = 3;
+        } else if (me.plan === '7days') {
+            dailyLimit = 5;
+        } else {
+            dailyLimit = Infinity; // 1month / 6months = unlimited
         }
 
-        // Add to received for target
+        if (dailyLimit !== Infinity) {
+            if (!me.dailyInterests || me.dailyInterests.date !== today) {
+                me.dailyInterests.date = today;
+                me.dailyInterests.count = 0;
+                me.markModified('dailyInterests');
+            }
+            if (me.dailyInterests.count >= dailyLimit) {
+                return res.json({ success: false, message: `Daily interest limit (${dailyLimit}) reached. Upgrade to send more!` });
+            }
+            me.dailyInterests.count += 1;
+            me.markModified('dailyInterests');
+        }
+
+        // Initialize arrays if missing (for old users)
+        if (!me.interestsSent) me.interestsSent = [];
+        if (!me.interestsReceived) me.interestsReceived = [];
+        if (!me.matches) me.matches = [];
+        if (!target.interestsSent) target.interestsSent = [];
+        if (!target.interestsReceived) target.interestsReceived = [];
+        if (!target.matches) target.matches = [];
+
+        // Add to me.interestsSent
+        if (!me.interestsSent.includes(targetEmail)) {
+            me.interestsSent.push(targetEmail);
+        }
+        await me.save();
+
+        // ── If target already sent me interest → MUTUAL MATCH ────────────────
+        if (me.interestsReceived.includes(targetEmail)) {
+            // Create mutual match
+            if (!me.matches.includes(targetEmail)) me.matches.push(targetEmail);
+            if (!target.matches.includes(me.email)) target.matches.push(me.email);
+
+            // Clean up interests
+            me.interestsReceived = me.interestsReceived.filter(e => e !== targetEmail);
+            target.interestsSent = target.interestsSent.filter(e => e !== me.email);
+
+            await me.save();
+            await target.save();
+            return res.json({ success: true, matched: true, message: "💞 It's a Match! You can now chat if you're on Premium." });
+        }
+
+        // Add to target.interestsReceived
         if (!target.interestsReceived.includes(me.email)) {
             target.interestsReceived.push(me.email);
-
-            // Auto match if they also sent you one previously
-            if (me.interestsReceived && me.interestsReceived.includes(targetEmail)) {
-                me.matches.push(targetEmail);
-                target.matches.push(me.email);
-
-                await me.save();
-                await target.save();
-                return res.json({ success: true, message: "Mutual Match! You can now chat." });
-            }
             await target.save();
         }
 
-        res.json({ success: true, message: "Interest sent!" });
+        res.json({ success: true, matched: false, message: "Interest sent successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+});
+
+// **** Reject Interest ────────────────────────────────────────────────────────
+router.post('/rejectinterest', fetchuser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { targetEmail } = req.body;
+
+        const me = await User.findById(userId);
+        const target = await User.findOne({ email: targetEmail });
+
+        if (!target) return res.json({ success: false, message: "User not found" });
+
+        // Remove from my received
+        me.interestsReceived = (me.interestsReceived || []).filter(e => e !== targetEmail);
+        // Remove from their sent
+        target.interestsSent = (target.interestsSent || []).filter(e => e !== me.email);
+
+        await me.save();
+        await target.save();
+
+        res.json({ success: true, message: "Interest rejected." });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, error: "Internal Server Error" });
@@ -858,39 +945,56 @@ router.get('/getusers', async (req, res) => {
 
 
 
-router.post('/sendmail', async (req, res) => {
+// **** Send Message (Premium + Matched ONLY) ────────────────────────────────
+router.post('/sendmail', fetchuser, async (req, res) => {
     try {
+        const userId = req.user.id;
         const { to, senderEmail, subject, description, senderName } = req.body;
-        console.log("Name", senderEmail);
 
-        // Anti-cheat verification
+        const me = await User.findById(userId);
+        await autoExpirePlan(me);
+
+        // ── Must be premium ───────────────────────────────────────────────────
+        if (!isPremiumActive(me)) {
+            return res.status(403).json({ success: false, error: "PREMIUM_REQUIRED", message: "Upgrade to Premium to send messages!" });
+        }
+
+        // ── Must be matched with recipient ────────────────────────────────────
+        if (!me.matches || !me.matches.includes(to)) {
+            return res.status(403).json({ success: false, error: "MATCH_REQUIRED", message: "You can only chat with your matches!" });
+        }
+
+        // Anti-cheat filter
         const filteredMessage = antiCheatFilter(description);
 
-        // Save the message in the database
         await Message.create({
-            to: to,
+            to,
             from: senderEmail,
-            senderName: senderName,
-            subject: subject,
+            senderName,
+            subject,
             message: filteredMessage
         });
 
-        res.json({ success: true, message: 'Message sent successfully!' });
-
+        res.json({ success: true, message: 'Message sent!' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Internal server error while sending message' });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
 
-// API endpoint to fetch messages received by the user
+// **** Get Inbox (Premium + matched conversations only) ───────────────────────
 router.get('/getmessages', fetchuser, async (req, res) => {
     try {
         const userId = req.user.id;
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ success: false, error: 'User not found' });
+        if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+
+        await autoExpirePlan(user);
+
+        if (!isPremiumActive(user)) {
+            return res.status(403).json({ success: false, error: 'PREMIUM_REQUIRED', message: 'Upgrade to Premium to view messages!' });
         }
+
         const messages = await Message.find({ to: user.email }).sort({ date: -1 });
         res.status(200).json(messages);
     } catch (error) {
@@ -1098,5 +1202,89 @@ router.post("/otp-verify", async (req, res) => {
 
 
 
+
+// --- EMAIL OTP VERIFICATION SYSTEM ---
+const registrationOtps = new Map(); // Store as { email: { otp, expiresAt } }
+
+router.post("/send-otp", async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, error: "Email is required" });
+
+        // Generate 6 digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Save in memory for 5 minutes
+        registrationOtps.set(email, {
+            otp,
+            expiresAt: Date.now() + 5 * 60 * 1000
+        });
+
+        // Include the Brevo library
+        const SibApiV3Sdk = require('sib-api-v3-sdk');
+        let defaultClient = SibApiV3Sdk.ApiClient.instance;
+
+        // Instantiate the client with the provided API Key
+        let apiKey = defaultClient.authentications['api-key'];
+        apiKey.apiKey = process.env.BREVO_API_KEY;
+
+        // Set up the transactional email 
+        let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+        let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+        sendSmtpEmail.subject = "Saanjh Matrimony - Email Verification OTP";
+        sendSmtpEmail.htmlContent = `
+        <div style="font-family: Arial, sans-serif; background: #fdf2f8; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto; color: #333; text-align: center;">
+            <h2 style="color: #fb6f92; margin-bottom: 20px;">Saanjh Matrimony</h2>
+            <p style="font-size: 16px;">Please use the following OTP to verify your email address:</p>
+            <div style="background: white; padding: 15px 30px; display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 8px; border-radius: 10px; color: #fb6f92; border: 2px solid #ff8fab; margin: 20px 0;">
+                ${otp}
+            </div>
+            <p style="color: #666; font-size: 13px;">This OTP will expire in 5 minutes.</p>
+        </div>`;
+        sendSmtpEmail.sender = { "name": "Saanjh Matrimony", "email": process.env.EMAIL_USER || "bansalsarthak711@gmail.com" };
+        sendSmtpEmail.to = [{ "email": email }];
+
+        // Make the call to the client
+        try {
+            const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+            console.log('API called successfully. Returned data: ' + JSON.stringify(data));
+            res.json({ success: true, message: "OTP sent successfully" });
+        } catch (error) {
+            console.error("Error sending OTP via Brevo: ", error);
+            res.status(500).json({ success: false, error: "Failed to send OTP to your email." });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+});
+
+router.post("/verify-otp", async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const stored = registrationOtps.get(email);
+
+        if (!stored) {
+            return res.status(400).json({ success: false, error: "OTP has expired or was not sent." });
+        }
+
+        if (Date.now() > stored.expiresAt) {
+            registrationOtps.delete(email);
+            return res.status(400).json({ success: false, error: "OTP has expired." });
+        }
+
+        if (stored.otp !== String(otp).trim()) {
+            return res.status(400).json({ success: false, error: "Incorrect OTP." });
+        }
+
+        // OTP is correct
+        registrationOtps.delete(email);
+        res.json({ success: true, message: "Email verified successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+});
 
 module.exports = router;

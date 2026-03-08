@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import Navbar from './fcomponents/Navbar';
 import Footer from './fcomponents/Footer';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
+import logo from '../saanjh-logo.jpg';
 
 const Admin = () => {
   const [creds, setCreds] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const navigate = useNavigate();
 
   const onChange = (e) => {
     setCreds({ ...creds, [e.target.name]: e.target.value });
@@ -47,10 +46,11 @@ const Admin = () => {
 
           <div style={{ borderRadius: "30px", overflow: "hidden", background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
 
-            {/* Header Box (Slightly altered hue for Admin mode) */}
+            {/* Header Box */}
             <div className="text-center py-4" style={{ background: "linear-gradient(135deg, #1f2937, #111827)", color: "white" }}>
+              <img src={logo} alt="Saanjh" style={{ height: "70px", objectFit: "contain", marginBottom: "10px", filter: "brightness(1.1) grayscale(0.2)" }} />
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: "bold", margin: 0 }}>Admin Portal</h2>
-              <p className="mb-0 mt-2" style={{ opacity: 0.9 }}>Restricted system access</p>
+              <p className="mb-0 mt-2" style={{ opacity: 0.8 }}>Restricted system access</p>
             </div>
 
             <div className="p-4 p-md-5">

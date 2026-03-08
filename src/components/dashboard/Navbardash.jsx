@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import logo from '../../saanjh-logo.jpg';
 
 
 const Navbardash = () => {
@@ -11,9 +12,13 @@ const Navbardash = () => {
 
 
       <nav className="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-        <div className="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-          <a className="navbar-brand brand-logo" href="/">Saanjh</a>
-          <a className="navbar-brand brand-logo-mini" href="/">M</a>
+        <div className="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center" style={{ background: "#fff" }}>
+          <a className="navbar-brand brand-logo" href="/">
+            <img src={logo} alt="Saanjh" style={{ height: "52px", objectFit: "contain" }} />
+          </a>
+          <a className="navbar-brand brand-logo-mini" href="/">
+            <img src={logo} alt="S" style={{ height: "36px", objectFit: "contain" }} />
+          </a>
         </div>
         <div className="navbar-menu-wrapper d-flex align-items-center justify-content-end">
           {/* <button className="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
