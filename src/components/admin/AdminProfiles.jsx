@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal } from 'react-bootstrap';
@@ -13,7 +14,7 @@ const AdminProfiles = () => {
     }, []);
 
     const fetchUsers = () => {
-        axios.get('http://localhost:5001/auth/getusers')
+        axios.get(`${API}/auth/getusers`)
             .then(response => setAllusers(response.data))
             .catch(error => console.error('Error fetching all users:', error));
     };
@@ -33,7 +34,7 @@ const AdminProfiles = () => {
         if (!confirmDelete) return;
 
         try {
-            await axios.delete(`http://localhost:5001/auth/deleteuser/${userId}`);
+            await axios.delete(`${API}/auth/deleteuser/${userId}`);
             setAllusers(allusers.filter(user => user._id !== userId));
             alert("User deleted successfully.");
         } catch (error) {
@@ -48,7 +49,7 @@ const AdminProfiles = () => {
         if (!confirmMod) return;
 
         try {
-            const res = await axios.post(`http://localhost:5001/auth/admin/modstatus`, {
+            const res = await axios.post(`${API}/auth/admin/modstatus`, {
                 targetId, targetStatus: newStatus
             });
             if (res.data.success) {
@@ -128,7 +129,7 @@ const AdminProfiles = () => {
                                                     <tr key={all._id} style={{ opacity: all.status === "blocked" ? 0.6 : 1 }}>
                                                         <td>
                                                             <div className="d-flex align-items-center">
-                                                                <img src={`http://localhost:5001/${all.image || 'uploads/default.png'}`} alt="avatar" style={{ width: "45px", height: "45px", borderRadius: "50%", objectFit: "cover" }} />
+                                                                <img src={`${API}/${all.image || 'uploads/default.png'}`} alt="avatar" style={{ width: "45px", height: "45px", borderRadius: "50%", objectFit: "cover" }} />
                                                                 <div className="ms-3 ml-3">
                                                                     <p className="fw-bold mb-1" style={{ fontWeight: "bold", color: "var(--deep-pink)" }}>{all.name}</p>
                                                                     <p className="text-muted mb-0" style={{ fontSize: "12px" }}>{all.gender} • {all.age} yrs • {all.caste}</p>

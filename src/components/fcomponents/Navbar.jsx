@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import logo from './fimages/saanjh-logo.jpg'
 
 const Navbar = () => {
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   return (
     <>
       <header id="header" className="fixed-top d-flex align-items-center">
@@ -14,12 +15,12 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <nav id="navbar" class="navbar">
+          <nav id="navbar" className={`navbar ${isMobileNavOpen ? 'navbar-mobile' : ''}`}>
             <ul>
-              <li><a className="nav-link scrollto active" href="/">Home</a></li>
-              <li><a className="nav-link scrollto" href="#about" >About Us</a></li>
+              <li><Link className="nav-link scrollto active" to="/">Home</Link></li>
+              <li><a className="nav-link scrollto" href="#about" onClick={() => setIsMobileNavOpen(false)}>About Us</a></li>
               {/* <li><a className="nav-link scrollto" href="/Services">Services</a></li> */}
-              <li><a className="nav-link scrollto" href="#success">Success stories</a></li>
+              <li><a className="nav-link scrollto" href="#success" onClick={() => setIsMobileNavOpen(false)}>Success stories</a></li>
               {/* <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="#">Drop Down 1</a></li>
@@ -41,7 +42,10 @@ const Navbar = () => {
               <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/signup">Sign Up</Link></li>
               <li><Link className="getstarted scrollto" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))" }} to="/admin">Admin</Link></li>
             </ul>
-            <i class="bi bi-list mobile-nav-toggle"></i>
+            <i
+              className={`bi mobile-nav-toggle ${isMobileNavOpen ? 'bi-x' : 'bi-list'}`}
+              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            ></i>
           </nav>
 
         </div>

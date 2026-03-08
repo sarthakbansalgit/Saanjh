@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
@@ -20,7 +21,7 @@ const Navside = (props) => {
 
   async function getUser() {
     try {
-      const response = await axios.get('http://localhost:5001/auth/getuser', {
+      const response = await axios.get(`${API}/auth/getuser`, {
         mode: 'no-cors',
         headers: {
           "auth-token": `${localStorage.getItem('token')}`

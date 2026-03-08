@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -17,7 +18,7 @@ const Myprofile = () => {
 
     async function getUser() {
         try {
-            const response = await axios.get('http://localhost:5001/auth/getuser', {
+            const response = await axios.get(`${API}/auth/getuser`, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             setUser(response.data);
@@ -36,7 +37,7 @@ const Myprofile = () => {
         uploadData.append('image', selectedImage);
 
         try {
-            const response = await axios.post('http://localhost:5001/auth/uploadimage', uploadData, {
+            const response = await axios.post(`${API}/auth/uploadimage`, uploadData, {
                 headers: {
                     "auth-token": localStorage.getItem('token'),
                     "Content-Type": "multipart/form-data",
@@ -58,7 +59,7 @@ const Myprofile = () => {
 
     const handleUpdateProfile = async () => {
         try {
-            const response = await axios.put('http://localhost:5001/auth/updateuser', formData, {
+            const response = await axios.put(`${API}/auth/updateuser`, formData, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             if (response.data.success) {
@@ -93,7 +94,7 @@ const Myprofile = () => {
 
                 <div className="row glass-card" style={{ display: 'flex', flexWrap: 'wrap' }}>
                     <div className="col-md-4 text-center mb-4 border-right pb-4">
-                        <img src={`http://localhost:5001/${user.image}`} style={{ width: "230px", height: "230px", objectFit: "cover", borderRadius: "50%", boxShadow: "0 10px 20px rgba(0,0,0,0.1)", border: "4px solid var(--primary-pink)" }} alt="User" />
+                        <img src={`${API}/${user.image}`} style={{ width: "230px", height: "230px", objectFit: "cover", borderRadius: "50%", boxShadow: "0 10px 20px rgba(0,0,0,0.1)", border: "4px solid var(--primary-pink)" }} alt="User" />
                         <div className="mt-4">
                             <input className='form-control form-control-sm mb-2' type="file" accept="image/*" onChange={handleImageChange} style={{ background: "rgba(255,255,255,0.8)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "5px" }} />
                             <button className='btn btn-sm' style={{ background: 'var(--deep-pink)', color: 'white', borderRadius: '20px', padding: '8px 20px', border: 'none', width: "100%" }} onClick={handleImageUpload}>

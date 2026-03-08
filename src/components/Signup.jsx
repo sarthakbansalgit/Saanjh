@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState, useEffect } from 'react';
 import Navbar from './fcomponents/Navbar';
 import Footer from './fcomponents/Footer';
@@ -103,7 +104,7 @@ const Signup = () => {
                     // Map createdBy if necessary, backend absorbs everything via req.body
                 }
 
-                const { data } = await axios.post('http://localhost:5001/auth/page1/createuser', payload, {
+                const { data } = await axios.post(`${API}/auth/page1/createuser`, payload, {
                     headers: { 'Content-Type': 'application/json' }
                 });
 

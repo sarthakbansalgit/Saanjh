@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState } from 'react';
 import Navbar from './fcomponents/Navbar';
 import Footer from './fcomponents/Footer';
@@ -21,7 +22,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const { data } = await axios.post('http://localhost:5001/auth/login', creds, {
+            const { data } = await axios.post(`${API}/auth/login`, creds, {
                 headers: { 'Content-Type': 'application/json' }
             });
 

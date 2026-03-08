@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, {useState} from 'react'
 import axios from 'axios';
 
@@ -23,7 +24,7 @@ const Sendmail = (props) => {
 
         
           try {
-            const response = await axios.post('http://localhost:5001/auth/sendmail', {
+            const response = await axios.post(`${API}/auth/sendmail`, {
                 to:email,
                 subject:udetails.subject,
                 senderEmail: customer,

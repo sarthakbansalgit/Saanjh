@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 import Sendmail from './Sendmail';
 import axios from 'axios';
@@ -13,7 +14,7 @@ const UserProfile = ({ user, isFree }) => {
 
   async function getUser() {
     try {
-      const response = await axios.get('http://localhost:5001/auth/getuser', {
+      const response = await axios.get(`${API}/auth/getuser`, {
         headers: {
           "auth-token": localStorage.getItem('token')
         }
@@ -34,7 +35,7 @@ const UserProfile = ({ user, isFree }) => {
     <>
       <div className='d-flex flex-column'>
         <div className='text-center mb-4'>
-          <img src={`http://localhost:5001/${user.image || 'uploads/default.png'}`} style={{ width: "200px", height: "200px", objectFit: "cover", borderRadius: "50%", boxShadow: "0 10px 20px rgba(251, 111, 146, 0.3)", border: "4px solid var(--primary-pink)", filter: isFree ? "blur(20px)" : "none", transition: "all 0.3s ease" }} alt="User" />
+          <img src={`${API}/${user.image || 'uploads/default.png'}`} style={{ width: "200px", height: "200px", objectFit: "cover", borderRadius: "50%", boxShadow: "0 10px 20px rgba(251, 111, 146, 0.3)", border: "4px solid var(--primary-pink)", filter: isFree ? "blur(20px)" : "none", transition: "all 0.3s ease" }} alt="User" />
 
           {isFree && <p style={{ color: "red", fontWeight: "bold", marginTop: "10px" }}>Image Blurred - Upgrade to Premium</p>}
 

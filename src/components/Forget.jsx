@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState } from 'react';
 import axios from 'axios';
 import Reset from './Reset';
@@ -13,7 +14,7 @@ const Forget = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('http://localhost:5001/auth/email-send', { email: creds.email }, {
+            const { data } = await axios.post(`${API}/auth/email-send`, { email: creds.email }, {
                 headers: { 'Content-Type': 'application/json' }
             });
 

@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal } from 'react-bootstrap';
@@ -14,11 +15,11 @@ const Searchprofile = () => {
     const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
-        axios.get('http://localhost:5001/auth/getusers')
+        axios.get(`${API}/auth/getusers`)
             .then(response => setAllusers(response.data))
             .catch(error => console.error('Error fetching all users:', error));
 
-        axios.get('http://localhost:5001/auth/getuser', {
+        axios.get(`${API}/auth/getuser`, {
             headers: { "auth-token": localStorage.getItem('token') }
         }).then(res => setMe(res.data)).catch(() => { });
     }, []);
@@ -97,7 +98,7 @@ const Searchprofile = () => {
                             >
                                 <div style={{ position: "relative" }}>
                                     <img
-                                        src={`http://localhost:5001/${user.image || 'uploads/default.png'}`}
+                                        src={`${API}/${user.image || 'uploads/default.png'}`}
                                         alt={user.name}
                                         style={{ width: "100%", height: "220px", objectFit: "cover", filter: isFree ? "blur(8px)" : "none" }}
                                     />

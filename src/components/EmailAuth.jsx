@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -39,7 +40,7 @@ const EmailAuth = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post('http://localhost:5001/auth/send-otp', { email });
+            const res = await axios.post(`${API}/auth/send-otp`, { email });
 
             if (res.data.success) {
                 setOtpSent(true);
@@ -65,7 +66,7 @@ const EmailAuth = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5001/auth/verify-otp', { email, otp });
+            const res = await axios.post(`${API}/auth/verify-otp`, { email, otp });
 
             if (res.data.success) {
                 // Save verified email

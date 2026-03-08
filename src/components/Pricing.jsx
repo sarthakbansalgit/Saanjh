@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState } from 'react';
 import axios from 'axios';
 import Navbar from './fcomponents/Navbar';
@@ -23,7 +24,7 @@ const Pricing = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5001/auth/gopremium', { planTier }, {
+            const res = await axios.post(`${API}/auth/gopremium`, { planTier }, {
                 headers: { "auth-token": token }
             });
 

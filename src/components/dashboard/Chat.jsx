@@ -1,8 +1,9 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io.connect("http://localhost:5001");
+const socket = io.connect(API);
 const GLOBAL_ROOM = "GlobalRoom";
 
 const Chat = () => {
@@ -26,7 +27,7 @@ const Chat = () => {
 
     async function getUser() {
         try {
-            const response = await axios.get('http://localhost:5001/auth/getuser', {
+            const response = await axios.get(`${API}/auth/getuser`, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             setUser(response.data.name);

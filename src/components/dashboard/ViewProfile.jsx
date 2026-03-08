@@ -1,3 +1,4 @@
+import API from '../../api';
 import React,{useState} from 'react'
 import axios from 'axios'
 
@@ -11,7 +12,7 @@ const ViewProfile = (props) => {
 
     async function getUser() {
         try {
-          const response = await axios.get('http://localhost:5001/auth/getuserbyid', {
+          const response = await axios.get(`${API}/auth/getuserbyid`, {
             mode: 'no-cors',
             headers: {
               "id": `${props.myId}`

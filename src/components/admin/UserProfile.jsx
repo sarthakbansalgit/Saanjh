@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sendmail from '../dashboard/Sendmail';
@@ -13,7 +14,7 @@ const UserProfile = ({ user }) => {
 
   async function getUser() {
     try {
-      const response = await axios.get('http://localhost:5001/auth/getuser', {
+      const response = await axios.get(`${API}/auth/getuser`, {
         headers: {
           "auth-token": localStorage.getItem('token')
         }
@@ -34,7 +35,7 @@ const UserProfile = ({ user }) => {
     <>
       <div className='d-flex2'>
         <div className='mx-2'>
-          <img src={`http://localhost:5001/${user.image}`} style={{ width: "300px", borderRadius: "10px" }} alt="User" />
+          <img src={`${API}/${user.image}`} style={{ width: "300px", borderRadius: "10px" }} alt="User" />
         </div>
         <div className='mx-2 my-4 d-flex'>
           <div className="left">

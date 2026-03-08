@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ const Messages = () => {
     const chatBodyRef = useRef(null);
 
     useEffect(() => {
-        axios.get('http://localhost:5001/auth/getuser', {
+        axios.get(`${API}/auth/getuser`, {
             headers: { "auth-token": localStorage.getItem("token") }
         }).then(res => {
             setMyUser(res.data);
@@ -28,7 +29,7 @@ const Messages = () => {
     }, []); // eslint-disable-line
 
     const fetchInbox = () => {
-        axios.get('http://localhost:5001/auth/getmessages', {
+        axios.get(`${API}/auth/getmessages`, {
             headers: { "auth-token": localStorage.getItem("token") }
         }).then(response => {
             const uniqueSenders = [];
@@ -50,7 +51,7 @@ const Messages = () => {
     };
 
     const fetchConversation = (otherEmail) => {
-        axios.get(`http://localhost:5001/auth/getconversation/${otherEmail}`, {
+        axios.get(`${API}/auth/getconversation/${otherEmail}`, {
             headers: { "auth-token": localStorage.getItem("token") }
         }).then(res => {
             setConversation(res.data.messages);
@@ -67,7 +68,7 @@ const Messages = () => {
 
     const handleSendMessage = () => {
         if (!newMessage.trim() || !myUser) return;
-        axios.post('http://localhost:5001/auth/sendmail', {
+        axios.post(`${API}/auth/sendmail`, {
             to: activeChatEmail,
             senderEmail: myUser.email,
             senderName: myUser.name,

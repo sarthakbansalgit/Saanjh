@@ -1,3 +1,4 @@
+import API from '../../api';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal } from 'react-bootstrap';
@@ -27,7 +28,7 @@ const ALLprofiles = () => {
 
     const getUser = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/auth/getuser', {
+            const res = await axios.get(`${API}/auth/getuser`, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             setMe(res.data);
@@ -40,7 +41,7 @@ const ALLprofiles = () => {
 
     const getUsersList = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/auth/getusers');
+            const res = await axios.get(`${API}/auth/getusers`);
             setAllusers(res.data);
         } catch (error) {
             console.error('Error fetching all users:', error);
@@ -50,7 +51,7 @@ const ALLprofiles = () => {
     const handleViewProfile = async (targetUser) => {
         if (!me) return alert("Please log in first");
         try {
-            const res = await axios.post(`http://localhost:5001/auth/viewprofile/${targetUser._id}`, {}, {
+            const res = await axios.post(`${API}/auth/viewprofile/${targetUser._id}`, {}, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             if (res.data.success && res.data.allowed) {
@@ -80,7 +81,7 @@ const ALLprofiles = () => {
     const handleSendInterest = async (targetEmail) => {
         if (!me) return showToast("Please log in first", 'error');
         try {
-            const res = await axios.post(`http://localhost:5001/auth/sendinterest`, { targetEmail }, {
+            const res = await axios.post(`${API}/auth/sendinterest`, { targetEmail }, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             if (res.data.matched) {
@@ -96,7 +97,7 @@ const ALLprofiles = () => {
 
     const handleRejectInterest = async (targetEmail) => {
         try {
-            await axios.post(`http://localhost:5001/auth/rejectinterest`, { targetEmail }, {
+            await axios.post(`${API}/auth/rejectinterest`, { targetEmail }, {
                 headers: { "auth-token": localStorage.getItem('token') }
             });
             showToast("Interest rejected.", 'info');
@@ -293,7 +294,7 @@ const ALLprofiles = () => {
                                     )}
 
                                     <div style={{ position: "relative" }}>
-                                        <img src={`http://localhost:5001/${userCard.image || 'uploads/default.png'}`} alt={userCard.name} style={imgStyle} />
+                                        <img src={`${API}/${userCard.image || 'uploads/default.png'}`} alt={userCard.name} style={imgStyle} />
                                         {isFree && (
                                             <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center" }}>
                                                 <span style={{ background: "rgba(0,0,0,0.6)", color: "white", padding: "6px 16px", borderRadius: "20px", fontSize: "12px" }}>🔒 Upgrade to view photo</span>

@@ -1,3 +1,4 @@
+import API from '../api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -12,7 +13,7 @@ const Reset = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('http://localhost:5001/auth/otp-verify', {
+            const { data } = await axios.post(`${API}/auth/otp-verify`, {
                 email: props.email,
                 password: creds.password,
                 otp: creds.otp
