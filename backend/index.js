@@ -24,13 +24,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/auth', require("./routes/auth"));
 
-// ── Serve React Production Build ──────────────────────────────────────────────
-const buildPath = path.join(__dirname, '..', 'build');
-app.use(express.static(buildPath));
-
-// All non-API requests → serve index.html (React Router handles them)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
+// ── Root Endpoint ─────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ message: "Saanjh Matrimony API is running perfectly!" });
 });
 
 // ── Socket.IO ────────────────────────────────────────────────────────────────
