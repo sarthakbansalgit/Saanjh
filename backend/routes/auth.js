@@ -1092,44 +1092,33 @@ router.post('/email-send', [
 
 
         if (otpResponse) {
-            const transporter = nodemailer.createTransport({
-                service: 'Gmail',
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: 'yourmail@gmail.com',
-                    pass: 'yourapppassword',
-                },
-            });
+            const SibApiV3Sdk = require('sib-api-v3-sdk');
+            let defaultClient = SibApiV3Sdk.ApiClient.instance;
 
+            let apiKey = defaultClient.authentications['api-key'];
+            apiKey.apiKey = process.env.BREVO_API_KEY;
 
-            let mailOptions = {
-                from: 'yourmail@gmail.com',
-                to: email,
-                subject: otpcode,
-                html:
-                    `<div style="padding:10px;" >
-            <p>Your OTP is</p>
+            let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+            let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+            sendSmtpEmail.subject = "Saanjh Matrimony - Password Reset Request";
+            sendSmtpEmail.htmlContent = `<div style="padding:10px;" >
+            <p>Your Password Reset OTP is</p>
             <ul>
             <li>OTP: ${otpcode}</li>
-      
             </ul>
-          </div>`
-            };
+          </div>`;
+            sendSmtpEmail.sender = { "name": "Saanjh Matrimony", "email": process.env.EMAIL_USER || "bansalsarthak711@gmail.com" };
+            sendSmtpEmail.to = [{ "email": email }];
 
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log(error);
-                    res.status(500).send('Error sending email');
-                } else {
-                    console.log('Email sent: ' + info.response);
-                    success = true
-                    res.status(200).send('Email sent successfully');
-                }
-            });
-
-
+            try {
+                const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+                console.log('Password reset email sent successfully.', data);
+                return res.json({ success: true, message: 'Email sent successfully' });
+            } catch (error) {
+                console.error("Error sending reset OTP via Brevo: ", error);
+                return res.status(500).json({ success: false, error: 'Error sending email' });
+            }
         }
 
 
