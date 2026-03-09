@@ -111,7 +111,7 @@ const Signup = () => {
                 if (data.success) {
                     localStorage.setItem('token', data.authToken);
                     window.alert("Successfully Registered! You are now logged in and redirected to the dashboard.");
-                    window.location.hash = "#/";
+                    window.location.replace(window.location.pathname + "#/");
                     window.location.reload();
                 }
                 else {

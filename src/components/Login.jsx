@@ -28,7 +28,7 @@ const Login = () => {
 
             if (data.success) {
                 localStorage.setItem('token', data.authToken);
-                window.location.hash = "#/";
+                window.location.replace(window.location.pathname + "#/");
                 window.location.reload();
             } else {
                 setErrorMsg(data.error);

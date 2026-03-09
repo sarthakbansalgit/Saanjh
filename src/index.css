@@ -704,6 +704,7 @@ h3[data-aos] {
   .wrapper {
     padding: 15px !important;
     margin: 20px auto !important;
+    width: 100% !important;
     max-width: calc(100% - 30px) !important;
   }
 

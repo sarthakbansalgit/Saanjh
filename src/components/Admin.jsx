@@ -27,7 +27,7 @@ const Admin = () => {
 
       if (data.success) {
         localStorage.setItem('token', data.authToken);
-        window.location.hash = "#/admin";
+        window.location.replace(window.location.pathname + "#/admin");
         window.location.reload();
       } else {
         setErrorMsg(data.error || "Invalid Access");
