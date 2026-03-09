@@ -46,11 +46,15 @@ const Navside = (props) => {
 
 
 
+  const handleNavClick = () => {
+    const sidebar = document.querySelector('.sidebar-offcanvas');
+    if (sidebar) {
+      sidebar.classList.remove('active');
+    }
+  };
+
   return (
     <>
-
-
-
 
       <nav className="sidebar sidebar-offcanvas" id="sidebar">
         <div className="user-profile">
@@ -66,27 +70,27 @@ const Navside = (props) => {
         </div>
         <ul className="nav">
           <li className="nav-item">
-            <a className="nav-link" href="/profile">
+            <a className="nav-link" href="#/profile" onClick={handleNavClick}>
               {/* <i className="icon-box menu-icon"></i> */}
               <span className="menu-title">My Profile</span>
             </a>
           </li>
 
           <li className="nav-item">
-            <a className="nav-link" href="/">
+            <a className="nav-link" href="#/" onClick={handleNavClick}>
               <span className="menu-title">Search Profiles</span>
             </a>
           </li>
 
           <li className="nav-item">
-            <a className="nav-link" href="/chat">
+            <a className="nav-link" href="#/chat" onClick={handleNavClick}>
               <span className="menu-title">Live Chat</span>
             </a>
           </li>
 
 
           <li className="nav-item">
-            <a className="nav-link" href="/messages">
+            <a className="nav-link" href="#/messages" onClick={handleNavClick}>
               <span className="menu-title">Messages</span>
             </a>
           </li>
@@ -94,7 +98,7 @@ const Navside = (props) => {
 
 
           <li className="nav-item">
-            <button onClick={props.handleLogout} className='btn btn-outline-secondary nav-link'>Logout</button>
+            <button onClick={() => { handleNavClick(); props.handleLogout(); }} className='btn btn-outline-secondary nav-link' style={{ border: "none" }}>Logout</button>
           </li>
 
 
