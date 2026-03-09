@@ -182,10 +182,10 @@ const Signup = () => {
                                         <h4 style={{ color: "var(--deep-pink)", margin: 0 }}>Basic Account Setup</h4>
                                     </div>
 
-                                    <div className="user-details" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="user-details user-details-grid">
                                         <div className="input-box" style={{ width: "100%", gridColumn: "span 2" }}>
                                             <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Profile Creating For</span>
-                                            <div style={{ display: "flex", gap: "15px" }}>
+                                            <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
                                                 {['Self', 'Son', 'Daughter', 'Brother', 'Sister', 'Friend', 'Relative'].map(option => (
                                                     <label key={option} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
                                                         <input type="radio" name="createdBy" value={option} checked={udetails.createdBy === option} onChange={handleChange} /> {option}
@@ -213,7 +213,7 @@ const Signup = () => {
                                             <ErrorSpan name="phone" />
                                         </div>
 
-                                        <div style={{ gridColumn: "span 2", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+                                        <div className="user-details-grid" style={{ gridColumn: "span 2" }}>
                                             <div className="input-box" style={{ width: "100%" }}>
                                                 <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Password</span>
                                                 <input type="password" name="password" value={udetails.password} onChange={handleChange} className="form-control" style={{ color: "#333", borderRadius: "10px", padding: "12px" }} />
@@ -235,10 +235,10 @@ const Signup = () => {
                                 <div className="step-animation">
                                     <h4 style={{ color: "var(--deep-pink)", marginBottom: "25px", borderBottom: "2px solid rgba(251,111,146,0.3)", paddingBottom: "10px" }}>Personal Details</h4>
 
-                                    <div className="user-details" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="user-details user-details-grid">
                                         <div className="input-box" style={{ width: "100%", gridColumn: "span 2" }}>
                                             <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Gender</span>
-                                            <div style={{ display: "flex", gap: "30px" }}>
+                                            <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
                                                 {['Male', 'Female'].map(option => (
                                                     <label key={option} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", padding: "10px 20px", border: "1px solid var(--primary-pink)", borderRadius: "10px", background: udetails.gender === option ? "var(--primary-pink)" : "white", color: udetails.gender === option ? "white" : "var(--text-dark)" }}>
                                                         <input type="radio" name="gender" value={option} checked={udetails.gender === option} onChange={handleChange} style={{ display: "none" }} /> {option}
@@ -280,7 +280,7 @@ const Signup = () => {
                                 <div className="step-animation">
                                     <h4 style={{ color: "var(--deep-pink)", marginBottom: "25px", borderBottom: "2px solid rgba(251,111,146,0.3)", paddingBottom: "10px" }}>Background & Location</h4>
 
-                                    <div className="user-details" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="user-details user-details-grid">
                                         <div className="input-box" style={{ width: "100%" }}>
                                             <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Religion</span>
                                             <select name="religion" value={udetails.religion} onChange={handleChange} className="form-control custom-select" style={{ color: "#333", borderRadius: "10px", padding: "12px" }}>
@@ -341,7 +341,7 @@ const Signup = () => {
                                 <div className="step-animation">
                                     <h4 style={{ color: "var(--deep-pink)", marginBottom: "25px", borderBottom: "2px solid rgba(251,111,146,0.3)", paddingBottom: "10px" }}>Education & Lifestyle</h4>
 
-                                    <div className="user-details" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="user-details user-details-grid">
                                         <div className="input-box" style={{ width: "100%" }}>
                                             <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Highest Education</span>
                                             <select name="education" value={udetails.education} onChange={handleChange} className="form-control custom-select" style={{ color: "#333", borderRadius: "10px", padding: "12px" }}>
