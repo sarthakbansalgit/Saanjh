@@ -1394,3 +1394,22 @@ section {
   text-align: center;
   padding: 15px 0px;
 }
+
+.success-title {
+  color: #800000;
+  font-family: 'Georgia', serif;
+  font-size: 42px;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .success-title {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 575px) {
+  .success-title {
+    font-size: 24px;
+  }
+}
