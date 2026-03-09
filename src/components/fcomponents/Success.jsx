@@ -17,10 +17,10 @@ const Success = () => {
 
             <div className="container" id='success'>
 
-                <h1 className='text-center my-5' style={{ color: "#800000", fontFamily: "'Georgia', serif", fontSize: "42px", fontWeight: "bold" }}>Saanjh diyan Success Stories</h1>
+                <h1 className='text-center my-5 success-title'>Saanjh diyan Success Stories</h1>
 
-                <div class="container text-center">
-                    <div class="row">
+                <div className="container text-center">
+                    <div className="row gy-4">
                         <div className="col-sm">
                             <div className="card shadow-sm border-0" style={{ borderRadius: "15px", overflow: "hidden" }}>
                                 <img className="card-img-top" src={success1} alt="Card cap" />
