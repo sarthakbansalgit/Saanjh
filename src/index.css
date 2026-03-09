@@ -696,3 +696,23 @@ h3[data-aos] {
   background: rgba(255, 255, 255, 0.9) !important;
   z-index: 2;
 }
+
+@media (max-width: 768px) {
+
+  .signup-container .container,
+  .login-container .wrapper,
+  .wrapper {
+    padding: 15px !important;
+    margin: 20px auto !important;
+    max-width: calc(100% - 30px) !important;
+  }
+
+  .signup-container .user-details .input-box {
+    width: 100% !important;
+  }
+
+  .signup-container .content.p-3.p-md-5,
+  .signup-container .content.p-5 {
+    padding: 15px !important;
+  }
+}
