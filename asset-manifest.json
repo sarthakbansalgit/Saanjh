@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/Saanjh/static/css/main.df6cd75f.css",
+    "main.css": "/Saanjh/static/css/main.f921bcfe.css",
     "main.js": "/Saanjh/static/js/main.cb8909f3.js",
     "static/media/success6.jpg": "/Saanjh/static/media/success6.fe4e4f11210924d0f80b.jpg",
     "static/media/saanjh-logo.jpg": "/Saanjh/static/media/saanjh-logo.c4f4a9792e76a27aee64.jpg",
@@ -11,11 +11,11 @@
     "static/media/about2.png": "/Saanjh/static/media/about2.606284031c83c0257ebc.png",
     "static/media/sanika.jpg": "/Saanjh/static/media/sanika.54bf28700216fb752105.jpg",
     "index.html": "/Saanjh/index.html",
-    "main.df6cd75f.css.map": "/Saanjh/static/css/main.df6cd75f.css.map",
+    "main.f921bcfe.css.map": "/Saanjh/static/css/main.f921bcfe.css.map",
     "main.cb8909f3.js.map": "/Saanjh/static/js/main.cb8909f3.js.map"
   },
   "entrypoints": [
-    "static/css/main.df6cd75f.css",
+    "static/css/main.f921bcfe.css",
     "static/js/main.cb8909f3.js"
   ]
 }
