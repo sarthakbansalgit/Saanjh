@@ -28,7 +28,8 @@ const Login = () => {
 
             if (data.success) {
                 localStorage.setItem('token', data.authToken);
-                window.location.href = "/";
+                window.location.hash = "#/";
+                window.location.reload();
             } else {
                 setErrorMsg(data.error);
             }
