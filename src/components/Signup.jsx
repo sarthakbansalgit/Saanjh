@@ -1,7 +1,6 @@
 import API from '../api';
 import React, { useState, useEffect } from 'react';
 import Navbar from './fcomponents/Navbar';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../saanjh-logo.jpg';
 
@@ -12,10 +11,9 @@ const STEPS = [
   { num: 4, label: 'Lifestyle' },
 ];
 
-const BG = "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80";
+const BG = process.env.PUBLIC_URL + "/bg.jpeg";
 
 const Signup = () => {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
   const [serverMsg, setServerMsg] = useState('');
@@ -366,7 +364,7 @@ const Signup = () => {
         .sp-overlay {
           position: fixed;
           inset: 0;
-          background: linear-gradient(135deg, rgba(80,0,40,0.72) 0%, rgba(180,60,100,0.55) 60%, rgba(0,0,0,0.65) 100%);
+          background: rgba(0, 0, 0, 0.52);
           pointer-events: none;
           z-index: 0;
         }

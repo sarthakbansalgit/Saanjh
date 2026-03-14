@@ -86,7 +86,7 @@ const EmailAuth = () => {
     return (
         <>
             <Navbar />
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", width: "100vw", background: "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed", marginLeft: "calc(-50vw + 50%)" }}>
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", width: "100vw", background: `url('${process.env.PUBLIC_URL}/bg.jpeg') center/cover no-repeat fixed`, marginLeft: "calc(-50vw + 50%)" }}>
 
                 <div className="wrapper" style={{ margin: "10px auto" }}>
                     <div style={{ borderRadius: "25px", overflow: "hidden" }}>

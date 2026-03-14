@@ -19,6 +19,7 @@ import Reset from './components/Reset';
 import Pricing from './components/Pricing';
 import EmailAuth from './components/EmailAuth';
 
+
 function App() {
   const user = localStorage.getItem("token");
 

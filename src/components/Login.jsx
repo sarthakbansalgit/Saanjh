@@ -43,7 +43,7 @@ const Login = () => {
         <>
             <Navbar />
 
-            <div className="py-5" style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed", marginLeft: "calc(-50vw + 50%)" }}>
+            <div className="py-5" style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: `url('${process.env.PUBLIC_URL}/bg.jpeg') center/cover no-repeat fixed`, marginLeft: "calc(-50vw + 50%)" }}>
 
                 <div style={{ width: "100%", maxWidth: "450px", margin: "0 20px" }}>
 
