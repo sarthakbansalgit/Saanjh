@@ -86,10 +86,10 @@ const EmailAuth = () => {
     return (
         <>
             <Navbar />
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", background: "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed" }}>
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", width: "100vw", background: "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed", marginLeft: "calc(-50vw + 50%)" }}>
 
-                <div style={{ width: "100%", maxWidth: "450px", margin: "0 20px" }}>
-                    <div style={{ borderRadius: "30px", overflow: "hidden", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
+                <div className="wrapper" style={{ margin: "10px auto" }}>
+                    <div style={{ borderRadius: "25px", overflow: "hidden" }}>
 
                         {/* Header */}
                         <div className="text-center py-4" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white" }}>
@@ -98,7 +98,7 @@ const EmailAuth = () => {
                             <p className="mb-0 mt-1" style={{ opacity: 0.85 }}>Verify your email to continue</p>
                         </div>
 
-                        <div className="p-4 p-md-5">
+                        <div className="p-3 p-md-5">
                             {error && (
                                 <div className="alert alert-danger text-center" style={{ borderRadius: "12px", fontSize: "14px" }}>
                                     {error}

@@ -136,18 +136,18 @@ const Signup = () => {
         <>
             <Navbar />
 
-            <div className="signup-container py-5" style={{ minHeight: "100vh", background: "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed" }}>
+            <div className="signup-container">
 
                 {/* Stepper Wizard Box */}
-                <div className="container p-0" style={{ maxWidth: "800px", margin: "0 auto", borderRadius: "30px", overflow: "hidden", background: "rgba(255, 255, 255, 0.7)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}>
+                <div className="signup-inner-card">
 
                     {/* Header/Progress bar */}
                     <div className="stepper-header text-center py-4" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white" }}>
-                        <img src={logo} alt="Saanjh" style={{ height: "70px", objectFit: "contain", marginBottom: "8px", filter: "brightness(1.05)" }} />
-                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: "bold" }}>Join Saanjh Matrimony</h2>
-                        <p className="mb-0">Find your perfect match</p>
+                        <img src={logo} alt="Saanjh" style={{ height: "75px", objectFit: "contain", marginBottom: "10px", filter: "brightness(1.05)" }} />
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: "bold", fontSize: "clamp(20px, 6vw, 32px)" }}>Join Saanjh Matrimony</h2>
+                        <p className="mb-0" style={{ fontSize: "clamp(12px, 3vw, 16px)" }}>Find your perfect match</p>
 
-                        <div className="d-flex justify-content-center align-items-center mt-3" style={{ gap: "20px" }}>
+                        <div className="d-flex justify-content-center align-items-center mt-3 px-2" style={{ gap: "10px" }}>
                             {[1, 2, 3, 4].map(num => (
                                 <div key={num} style={{ display: "flex", alignItems: "center" }}>
                                     <div style={{
@@ -161,13 +161,13 @@ const Signup = () => {
                                     }}>
                                         {num}
                                     </div>
-                                    {num < 4 && <div style={{ height: "4px", width: "30px", background: step > num ? "white" : "rgba(255,255,255,0.3)", marginLeft: "10px" }}></div>}
+                                    {num < 4 && <div style={{ height: "4px", width: "clamp(5px, 4vw, 30px)", background: step > num ? "white" : "rgba(255,255,255,0.3)", marginLeft: "5px" }}></div>}
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="content p-5">
+                    <div className="content p-3 p-md-5">
                         {serverMsg && step !== 5 && (
                             <div className="alert alert-danger text-center" style={{ borderRadius: "15px", fontSize: "14px", fontWeight: "bold" }}>
                                 ⚠️ {serverMsg}
@@ -180,7 +180,7 @@ const Signup = () => {
                             {step === 1 && (
                                 <div className="step-animation">
                                     <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2" style={{ borderBottomColor: "rgba(251,111,146,0.3)" }}>
-                                        <h4 style={{ color: "var(--deep-pink)", margin: 0 }}>Basic Account Setup</h4>
+                                        <h4 style={{ color: "var(--deep-pink)", margin: 0, fontSize: "clamp(18px, 5vw, 24px)" }}>Basic Account Setup</h4>
                                     </div>
 
                                     <div className="user-details user-details-grid">
@@ -188,7 +188,7 @@ const Signup = () => {
                                             <span className="details" style={{ fontWeight: "bold", color: "var(--text-dark)", marginBottom: "5px", display: "block" }}>Profile Creating For</span>
                                             <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
                                                 {['Self', 'Son', 'Daughter', 'Brother', 'Sister', 'Friend', 'Relative'].map(option => (
-                                                    <label key={option} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
+                                                    <label key={option} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", fontSize: "14px" }}>
                                                         <input type="radio" name="createdBy" value={option} checked={udetails.createdBy === option} onChange={handleChange} /> {option}
                                                     </label>
                                                 ))}

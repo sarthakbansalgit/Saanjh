@@ -38,7 +38,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header id="header" className="fixed-top d-flex align-items-center" style={{ zIndex: 998 }}>
+      <header id="header" className="fixed-top d-flex align-items-center" style={{ zIndex: 998, width: "100vw", left: 0 }}>
         <div className="container d-flex align-items-center justify-content-between">
           <div className="logo" style={{ lineHeight: 1 }}>
             <Link to="/" style={{ display: "inline-block", background: "#fff", borderRadius: "12px", padding: "4px 10px", boxShadow: "0 2px 12px rgba(0,0,0,0.12)" }}>
