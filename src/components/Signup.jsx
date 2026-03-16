@@ -179,7 +179,7 @@ const Signup = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={e => e.preventDefault()} className="sp-form">
+          <form onSubmit={step === 4 ? handleSubmit : nextStep} className="sp-form">
 
             {/* ── STEP 1 ── */}
             {step === 1 && (
@@ -343,8 +343,8 @@ const Signup = () => {
                 : <span />
               }
               {step < 4
-                ? <button type="button" onClick={nextStep} className="sp-btn-next">Continue →</button>
-                : <button type="button" onClick={handleSubmit} className="sp-btn-submit" disabled={loading}>
+                ? <button type="submit" className="sp-btn-next">Continue →</button>
+                : <button type="submit" className="sp-btn-submit" disabled={loading}>
                     {loading ? 'Registering...' : '✓ Complete Registration'}
                   </button>
               }
