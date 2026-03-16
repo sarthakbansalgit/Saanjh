@@ -13,6 +13,38 @@ const STEPS = [
 
 const BG = process.env.PUBLIC_URL + "/bg.jpeg";
 
+
+const Err = ({ name, errors }) => errors && errors[name]
+  ? <span className="sp-error">{errors[name]}</span>
+  : null;
+
+const Select = ({ name, children, udetails, handleChange, ...rest }) => (
+  <select name={name} value={udetails[name]} onChange={handleChange} className="sp-input" {...rest}>
+    {children}
+  </select>
+);
+
+const Input = ({ name, type = 'text', udetails, handleChange, ...rest }) => (
+  <input
+    type={type}
+    name={name}
+    value={udetails[name]}
+    onChange={handleChange}
+    className="sp-input"
+    autoComplete="off"
+    {...rest}
+  />
+);
+
+const Field = ({ name, label, errors, children }) => (
+  <div className="sp-field">
+    <label className="sp-label">{label}</label>
+    {children}
+    <Err name={name} errors={errors} />
+  </div>
+);
+
+
 const Signup = () => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
@@ -101,36 +133,11 @@ const Signup = () => {
     setLoading(false);
   };
 
-  const Err = ({ name }) => errors[name]
-    ? <span className="sp-error">{errors[name]}</span>
-    : null;
+  
 
-  const Select = ({ name, children, ...rest }) => (
-    <select name={name} value={udetails[name]} onChange={handleChange} className="sp-input" {...rest}>
-      {children}
-    </select>
-  );
-
-  const Input = ({ name, type = 'text', ...rest }) => (
-    <input
-      type={type}
-      name={name}
-      value={udetails[name]}
-      onChange={handleChange}
-      className="sp-input"
-      autoComplete="off"
-      {...rest}
-    />
-  );
-
-  const Field = ({ name, label, children }) => (
-    <div className="sp-field">
-      <label className="sp-label">{label}</label>
-      {children}
-      <Err name={name} />
-    </div>
-  );
-
+  
+  
+  
   return (
     <>
       <Navbar />
@@ -179,7 +186,7 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Basic Account Setup</h2>
 
-                <Field name="createdBy" label="Profile Creating For">
+                <Field errors={errors} name="createdBy" label="Profile Creating For">
                   <div className="sp-radio-group">
                     {['Self', 'Son', 'Daughter', 'Brother', 'Sister', 'Friend', 'Relative'].map(opt => (
                       <label key={opt} className={`sp-radio-pill ${udetails.createdBy === opt ? 'selected' : ''}`}>
@@ -191,23 +198,23 @@ const Signup = () => {
                 </Field>
 
                 <div className="sp-grid-2">
-                  <Field name="name" label="Full Name">
-                    <Input name="name" placeholder="Your full name" />
+                  <Field errors={errors} name="name" label="Full Name">
+                    <Input udetails={udetails} handleChange={handleChange} name="name" placeholder="Your full name" />
                   </Field>
-                  <Field name="email" label="Email Address">
-                    <Input name="email" type="email" placeholder="Email"
+                  <Field errors={errors} name="email" label="Email Address">
+                    <Input udetails={udetails} handleChange={handleChange} name="email" type="email" placeholder="Email"
                       readOnly={!!sessionStorage.getItem('verifiedEmail')}
                       style={{ background: sessionStorage.getItem('verifiedEmail') ? 'rgba(255,255,255,0.5)' : '' }}
                     />
                   </Field>
-                  <Field name="phone" label="Phone Number">
-                    <Input name="phone" type="number" placeholder="10-digit mobile number" />
+                  <Field errors={errors} name="phone" label="Phone Number">
+                    <Input udetails={udetails} handleChange={handleChange} name="phone" type="number" placeholder="10-digit mobile number" />
                   </Field>
-                  <Field name="password" label="Password">
-                    <Input name="password" type="password" placeholder="Min 8 characters" />
+                  <Field errors={errors} name="password" label="Password">
+                    <Input udetails={udetails} handleChange={handleChange} name="password" type="password" placeholder="Min 8 characters" />
                   </Field>
-                  <Field name="cpassword" label="Confirm Password">
-                    <Input name="cpassword" type="password" placeholder="Re-enter password" />
+                  <Field errors={errors} name="cpassword" label="Confirm Password">
+                    <Input udetails={udetails} handleChange={handleChange} name="cpassword" type="password" placeholder="Re-enter password" />
                   </Field>
                 </div>
               </div>
@@ -218,7 +225,7 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Personal Details</h2>
 
-                <Field name="gender" label="Gender">
+                <Field errors={errors} name="gender" label="Gender">
                   <div className="sp-radio-group">
                     {['Male', 'Female'].map(opt => (
                       <label key={opt} className={`sp-radio-pill ${udetails.gender === opt ? 'selected' : ''}`}>
@@ -230,17 +237,17 @@ const Signup = () => {
                 </Field>
 
                 <div className="sp-grid-2">
-                  <Field name="age" label="Age">
-                    <Input name="age" type="number" placeholder="Your age" />
+                  <Field errors={errors} name="age" label="Age">
+                    <Input udetails={udetails} handleChange={handleChange} name="age" type="number" placeholder="Your age" />
                   </Field>
-                  <Field name="dob" label="Date of Birth">
-                    <Input name="dob" type="date" />
+                  <Field errors={errors} name="dob" label="Date of Birth">
+                    <Input udetails={udetails} handleChange={handleChange} name="dob" type="date" />
                   </Field>
-                  <Field name="height" label="Height (cm)">
-                    <Input name="height" type="number" placeholder="e.g. 170" />
+                  <Field errors={errors} name="height" label="Height (cm)">
+                    <Input udetails={udetails} handleChange={handleChange} name="height" type="number" placeholder="e.g. 170" />
                   </Field>
-                  <Field name="weight" label="Weight (kg)">
-                    <Input name="weight" type="number" placeholder="e.g. 65" />
+                  <Field errors={errors} name="weight" label="Weight (kg)">
+                    <Input udetails={udetails} handleChange={handleChange} name="weight" type="number" placeholder="e.g. 65" />
                   </Field>
                 </div>
               </div>
@@ -251,34 +258,34 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Background &amp; Location</h2>
                 <div className="sp-grid-2">
-                  <Field name="religion" label="Religion">
-                    <Select name="religion">
+                  <Field errors={errors} name="religion" label="Religion">
+                    <Select udetails={udetails} handleChange={handleChange} name="religion">
                       <option value="">Select Religion</option>
                       {['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Parsi', 'No Religion'].map(r => <option key={r} value={r}>{r}</option>)}
                     </Select>
                   </Field>
-                  <Field name="caste" label="Caste">
-                    <Input name="caste" placeholder="Your caste" />
+                  <Field errors={errors} name="caste" label="Caste">
+                    <Input udetails={udetails} handleChange={handleChange} name="caste" placeholder="Your caste" />
                   </Field>
-                  <Field name="motherTongue" label="Mother Tongue">
-                    <Select name="motherTongue">
+                  <Field errors={errors} name="motherTongue" label="Mother Tongue">
+                    <Select udetails={udetails} handleChange={handleChange} name="motherTongue">
                       <option value="">Select Tongue</option>
                       {['Hindi', 'Punjabi', 'Marathi', 'Gujarati', 'Tamil', 'English'].map(t => <option key={t} value={t}>{t}</option>)}
                     </Select>
                   </Field>
-                  <Field name="maritalStatus" label="Marital Status">
-                    <Select name="maritalStatus">
+                  <Field errors={errors} name="maritalStatus" label="Marital Status">
+                    <Select udetails={udetails} handleChange={handleChange} name="maritalStatus">
                       {['Never Married', 'Awaiting Divorce', 'Divorced', 'Widowed'].map(m => <option key={m} value={m}>{m}</option>)}
                     </Select>
                   </Field>
-                  <Field name="state" label="State">
-                    <Select name="state">
+                  <Field errors={errors} name="state" label="State">
+                    <Select udetails={udetails} handleChange={handleChange} name="state">
                       <option value="">Select State</option>
                       {['Bihar', 'Delhi', 'Maharashtra', 'Punjab', 'Karnataka', 'Gujarat', 'Rajasthan', 'Uttar Pradesh', 'Tamil Nadu', 'West Bengal'].map(s => <option key={s} value={s}>{s}</option>)}
                     </Select>
                   </Field>
-                  <Field name="district" label="District / City">
-                    <Input name="district" placeholder="Your city or district" />
+                  <Field errors={errors} name="district" label="District / City">
+                    <Input udetails={udetails} handleChange={handleChange} name="district" placeholder="Your city or district" />
                   </Field>
                 </div>
               </div>
@@ -289,21 +296,21 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Education &amp; Lifestyle</h2>
                 <div className="sp-grid-2">
-                  <Field name="education" label="Highest Education">
-                    <Select name="education">
+                  <Field errors={errors} name="education" label="Highest Education">
+                    <Select udetails={udetails} handleChange={handleChange} name="education">
                       <option value="">Select</option>
                       {['BTech/BE', 'MBA', 'MTech', 'BCA', 'MCA', 'MBBS', 'BCom', 'BA', 'High School', 'Other'].map(e => <option key={e} value={e}>{e}</option>)}
                     </Select>
                   </Field>
-                  <Field name="working" label="Working Sector">
-                    <Select name="working">
+                  <Field errors={errors} name="working" label="Working Sector">
+                    <Select udetails={udetails} handleChange={handleChange} name="working">
                       <option value="">Select</option>
                       {['Private Sector', 'Govt Sector', 'Business/Self Employed', 'Defense', 'Not Working'].map(w => <option key={w} value={w}>{w}</option>)}
                     </Select>
                   </Field>
                 </div>
 
-                <Field name="description" label="About Me">
+                <Field errors={errors} name="description" label="About Me">
                   <textarea
                     name="description"
                     value={udetails.description}
@@ -313,10 +320,10 @@ const Signup = () => {
                     rows={4}
                   />
                   <small className="sp-note">⚠️ Do not share mobile numbers or social links — they will be removed.</small>
-                  <Err name="description" />
+                  <Err name="description" errors={errors} />
                 </Field>
 
-                <Field name="partnerPreference" label="Partner Preferences">
+                <Field errors={errors} name="partnerPreference" label="Partner Preferences">
                   <textarea
                     name="partnerPreference"
                     value={udetails.partnerPreference}
