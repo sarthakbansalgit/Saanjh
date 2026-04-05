@@ -11,4 +11,13 @@ root.render(
   </HashRouter>
 );
 
-
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then(registration => {
+    registration.unregister();
+  });
+}
+if (window.caches) {
+  caches.keys().then(names => {
+    names.forEach(name => caches.delete(name));
+  });
+}
