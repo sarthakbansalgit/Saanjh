@@ -14,35 +14,10 @@ const STEPS = [
 const BG = process.env.PUBLIC_URL + "/bg.jpeg";
 
 
-const Err = ({ name, errors }) => errors && errors[name]
-  ? <span className="sp-error">{errors[name]}</span>
-  : null;
 
-const Select = ({ name, children, udetails, handleChange, ...rest }) => (
-  <select name={name} value={udetails[name]} onChange={handleChange} className="sp-input" {...rest}>
-    {children}
-  </select>
-);
 
-const Input = ({ name, type = 'text', udetails, handleChange, ...rest }) => (
-  <input
-    type={type}
-    name={name}
-    value={udetails[name]}
-    onChange={handleChange}
-    className="sp-input"
-    autoComplete="off"
-    {...rest}
-  />
-);
 
-const Field = ({ name, label, errors, children }) => (
-  <div className="sp-field">
-    <label className="sp-label">{label}</label>
-    {children}
-    <Err name={name} errors={errors} />
-  </div>
-);
+
 
 
 const Signup = () => {
@@ -186,8 +161,9 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Basic Account Setup</h2>
 
-                <Field errors={errors} name="createdBy" label="Profile Creating For">
-                  <div className="sp-radio-group">
+                <div className="sp-field">
+                    <label className="sp-label">Profile Creating For</label>
+                    <div className="sp-radio-group">
                     {['Self', 'Son', 'Daughter', 'Brother', 'Sister', 'Friend', 'Relative'].map(opt => (
                       <label key={opt} className={`sp-radio-pill ${udetails.createdBy === opt ? 'selected' : ''}`}>
                         <input type="radio" name="createdBy" value={opt} checked={udetails.createdBy === opt} onChange={handleChange} hidden />
@@ -195,27 +171,63 @@ const Signup = () => {
                       </label>
                     ))}
                   </div>
-                </Field>
+                    {errors && errors['createdBy'] && <span className="sp-error">{errors['createdBy']}</span>}
+                  </div>
 
                 <div className="sp-grid-2">
-                  <Field errors={errors} name="name" label="Full Name">
-                    <Input udetails={udetails} handleChange={handleChange} name="name" placeholder="Your full name" />
-                  </Field>
-                  <Field errors={errors} name="email" label="Email Address">
-                    <Input udetails={udetails} handleChange={handleChange} name="email" type="email" placeholder="Email"
+                  <div className="sp-field">
+                    <label className="sp-label">Full Name</label>
+                    <input
+                      name="name"
+                      value={udetails['name']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" placeholder="Your full name" />
+                    {errors && errors['name'] && <span className="sp-error">{errors['name']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Email Address</label>
+                    <input
+                      name="email"
+                      value={udetails['email']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="email" placeholder="Email"
                       readOnly={!!sessionStorage.getItem('verifiedEmail')}
                       style={{ background: sessionStorage.getItem('verifiedEmail') ? 'rgba(255,255,255,0.5)' : '' }}
                     />
-                  </Field>
-                  <Field errors={errors} name="phone" label="Phone Number">
-                    <Input udetails={udetails} handleChange={handleChange} name="phone" type="number" placeholder="10-digit mobile number" />
-                  </Field>
-                  <Field errors={errors} name="password" label="Password">
-                    <Input udetails={udetails} handleChange={handleChange} name="password" type="password" placeholder="Min 8 characters" />
-                  </Field>
-                  <Field errors={errors} name="cpassword" label="Confirm Password">
-                    <Input udetails={udetails} handleChange={handleChange} name="cpassword" type="password" placeholder="Re-enter password" />
-                  </Field>
+                    {errors && errors['email'] && <span className="sp-error">{errors['email']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Phone Number</label>
+                    <input
+                      name="phone"
+                      value={udetails['phone']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="number" placeholder="10-digit mobile number" />
+                    {errors && errors['phone'] && <span className="sp-error">{errors['phone']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Password</label>
+                    <input
+                      name="password"
+                      value={udetails['password']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="password" placeholder="Min 8 characters" />
+                    {errors && errors['password'] && <span className="sp-error">{errors['password']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Confirm Password</label>
+                    <input
+                      name="cpassword"
+                      value={udetails['cpassword']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="password" placeholder="Re-enter password" />
+                    {errors && errors['cpassword'] && <span className="sp-error">{errors['cpassword']}</span>}
+                  </div>
                 </div>
               </div>
             )}
@@ -225,8 +237,9 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Personal Details</h2>
 
-                <Field errors={errors} name="gender" label="Gender">
-                  <div className="sp-radio-group">
+                <div className="sp-field">
+                    <label className="sp-label">Gender</label>
+                    <div className="sp-radio-group">
                     {['Male', 'Female'].map(opt => (
                       <label key={opt} className={`sp-radio-pill ${udetails.gender === opt ? 'selected' : ''}`}>
                         <input type="radio" name="gender" value={opt} checked={udetails.gender === opt} onChange={handleChange} hidden />
@@ -234,21 +247,50 @@ const Signup = () => {
                       </label>
                     ))}
                   </div>
-                </Field>
+                    {errors && errors['gender'] && <span className="sp-error">{errors['gender']}</span>}
+                  </div>
 
                 <div className="sp-grid-2">
-                  <Field errors={errors} name="age" label="Age">
-                    <Input udetails={udetails} handleChange={handleChange} name="age" type="number" placeholder="Your age" />
-                  </Field>
-                  <Field errors={errors} name="dob" label="Date of Birth">
-                    <Input udetails={udetails} handleChange={handleChange} name="dob" type="date" />
-                  </Field>
-                  <Field errors={errors} name="height" label="Height (cm)">
-                    <Input udetails={udetails} handleChange={handleChange} name="height" type="number" placeholder="e.g. 170" />
-                  </Field>
-                  <Field errors={errors} name="weight" label="Weight (kg)">
-                    <Input udetails={udetails} handleChange={handleChange} name="weight" type="number" placeholder="e.g. 65" />
-                  </Field>
+                  <div className="sp-field">
+                    <label className="sp-label">Age</label>
+                    <input
+                      name="age"
+                      value={udetails['age']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="number" placeholder="Your age" />
+                    {errors && errors['age'] && <span className="sp-error">{errors['age']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Date of Birth</label>
+                    <input
+                      name="dob"
+                      value={udetails['dob']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="date" />
+                    {errors && errors['dob'] && <span className="sp-error">{errors['dob']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Height (cm)</label>
+                    <input
+                      name="height"
+                      value={udetails['height']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="number" placeholder="e.g. 170" />
+                    {errors && errors['height'] && <span className="sp-error">{errors['height']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Weight (kg)</label>
+                    <input
+                      name="weight"
+                      value={udetails['weight']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" type="number" placeholder="e.g. 65" />
+                    {errors && errors['weight'] && <span className="sp-error">{errors['weight']}</span>}
+                  </div>
                 </div>
               </div>
             )}
@@ -258,35 +300,73 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Background &amp; Location</h2>
                 <div className="sp-grid-2">
-                  <Field errors={errors} name="religion" label="Religion">
-                    <Select udetails={udetails} handleChange={handleChange} name="religion">
+                  <div className="sp-field">
+                    <label className="sp-label">Religion</label>
+                    <select
+                      name="religion"
+                      value={udetails['religion']}
+                      onChange={handleChange}
+                      className="sp-input">
                       <option value="">Select Religion</option>
                       {['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Parsi', 'No Religion'].map(r => <option key={r} value={r}>{r}</option>)}
-                    </Select>
-                  </Field>
-                  <Field errors={errors} name="caste" label="Caste">
-                    <Input udetails={udetails} handleChange={handleChange} name="caste" placeholder="Your caste" />
-                  </Field>
-                  <Field errors={errors} name="motherTongue" label="Mother Tongue">
-                    <Select udetails={udetails} handleChange={handleChange} name="motherTongue">
+                    </select>
+                    {errors && errors['religion'] && <span className="sp-error">{errors['religion']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Caste</label>
+                    <input
+                      name="caste"
+                      value={udetails['caste']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" placeholder="Your caste" />
+                    {errors && errors['caste'] && <span className="sp-error">{errors['caste']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Mother Tongue</label>
+                    <select
+                      name="motherTongue"
+                      value={udetails['motherTongue']}
+                      onChange={handleChange}
+                      className="sp-input">
                       <option value="">Select Tongue</option>
                       {['Hindi', 'Punjabi', 'Marathi', 'Gujarati', 'Tamil', 'English'].map(t => <option key={t} value={t}>{t}</option>)}
-                    </Select>
-                  </Field>
-                  <Field errors={errors} name="maritalStatus" label="Marital Status">
-                    <Select udetails={udetails} handleChange={handleChange} name="maritalStatus">
+                    </select>
+                    {errors && errors['motherTongue'] && <span className="sp-error">{errors['motherTongue']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Marital Status</label>
+                    <select
+                      name="maritalStatus"
+                      value={udetails['maritalStatus']}
+                      onChange={handleChange}
+                      className="sp-input">
                       {['Never Married', 'Awaiting Divorce', 'Divorced', 'Widowed'].map(m => <option key={m} value={m}>{m}</option>)}
-                    </Select>
-                  </Field>
-                  <Field errors={errors} name="state" label="State">
-                    <Select udetails={udetails} handleChange={handleChange} name="state">
+                    </select>
+                    {errors && errors['maritalStatus'] && <span className="sp-error">{errors['maritalStatus']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">State</label>
+                    <select
+                      name="state"
+                      value={udetails['state']}
+                      onChange={handleChange}
+                      className="sp-input">
                       <option value="">Select State</option>
                       {['Bihar', 'Delhi', 'Maharashtra', 'Punjab', 'Karnataka', 'Gujarat', 'Rajasthan', 'Uttar Pradesh', 'Tamil Nadu', 'West Bengal'].map(s => <option key={s} value={s}>{s}</option>)}
-                    </Select>
-                  </Field>
-                  <Field errors={errors} name="district" label="District / City">
-                    <Input udetails={udetails} handleChange={handleChange} name="district" placeholder="Your city or district" />
-                  </Field>
+                    </select>
+                    {errors && errors['state'] && <span className="sp-error">{errors['state']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">District / City</label>
+                    <input
+                      name="district"
+                      value={udetails['district']}
+                      onChange={handleChange}
+                      className="sp-input"
+                      autoComplete="off" placeholder="Your city or district" />
+                    {errors && errors['district'] && <span className="sp-error">{errors['district']}</span>}
+                  </div>
                 </div>
               </div>
             )}
@@ -296,22 +376,35 @@ const Signup = () => {
               <div className="sp-step-section">
                 <h2 className="sp-step-title">Education &amp; Lifestyle</h2>
                 <div className="sp-grid-2">
-                  <Field errors={errors} name="education" label="Highest Education">
-                    <Select udetails={udetails} handleChange={handleChange} name="education">
+                  <div className="sp-field">
+                    <label className="sp-label">Highest Education</label>
+                    <select
+                      name="education"
+                      value={udetails['education']}
+                      onChange={handleChange}
+                      className="sp-input">
                       <option value="">Select</option>
                       {['BTech/BE', 'MBA', 'MTech', 'BCA', 'MCA', 'MBBS', 'BCom', 'BA', 'High School', 'Other'].map(e => <option key={e} value={e}>{e}</option>)}
-                    </Select>
-                  </Field>
-                  <Field errors={errors} name="working" label="Working Sector">
-                    <Select udetails={udetails} handleChange={handleChange} name="working">
+                    </select>
+                    {errors && errors['education'] && <span className="sp-error">{errors['education']}</span>}
+                  </div>
+                  <div className="sp-field">
+                    <label className="sp-label">Working Sector</label>
+                    <select
+                      name="working"
+                      value={udetails['working']}
+                      onChange={handleChange}
+                      className="sp-input">
                       <option value="">Select</option>
                       {['Private Sector', 'Govt Sector', 'Business/Self Employed', 'Defense', 'Not Working'].map(w => <option key={w} value={w}>{w}</option>)}
-                    </Select>
-                  </Field>
+                    </select>
+                    {errors && errors['working'] && <span className="sp-error">{errors['working']}</span>}
+                  </div>
                 </div>
 
-                <Field errors={errors} name="description" label="About Me">
-                  <textarea
+                <div className="sp-field">
+                    <label className="sp-label">About Me</label>
+                    <textarea
                     name="description"
                     value={udetails.description}
                     onChange={handleChange}
@@ -320,11 +413,12 @@ const Signup = () => {
                     rows={4}
                   />
                   <small className="sp-note">⚠️ Do not share mobile numbers or social links — they will be removed.</small>
-                  <Err name="description" errors={errors} />
-                </Field>
+                    {errors && errors['description'] && <span className="sp-error">{errors['description']}</span>}
+                  </div>
 
-                <Field errors={errors} name="partnerPreference" label="Partner Preferences">
-                  <textarea
+                <div className="sp-field">
+                    <label className="sp-label">Partner Preferences</label>
+                    <textarea
                     name="partnerPreference"
                     value={udetails.partnerPreference}
                     onChange={handleChange}
@@ -332,7 +426,8 @@ const Signup = () => {
                     className="sp-input sp-textarea"
                     rows={4}
                   />
-                </Field>
+                    {errors && errors['partnerPreference'] && <span className="sp-error">{errors['partnerPreference']}</span>}
+                  </div>
               </div>
             )}
 
