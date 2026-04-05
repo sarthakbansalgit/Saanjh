@@ -5,8 +5,6 @@ import axios from 'axios';
 import logo from '../saanjh-logo.jpg';
 import './Signup.css';
 
-const BG = process.env.PUBLIC_URL + "/bg.jpeg";
-
 const Signup = () => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
@@ -14,8 +12,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const formRef = useRef(null);
 
-  // We only hold state for the data when transitioning steps. 
-  // No onChange re-rendering while typing.
   const [udetails, setUdetails] = useState({
     name: '', age: '', email: '', phone: '', caste: '', dob: '',
     state: '', district: '', height: '', weight: '', education: '',
@@ -32,17 +28,16 @@ const Signup = () => {
   }, []);
 
   const saveCurrentStepData = () => {
-    if (!formRef.current) return {};
+    if (!formRef.current) return udetails;
     const fd = new FormData(formRef.current);
     const data = Object.fromEntries(fd.entries());
-    setUdetails(prev => ({ ...prev, ...data }));
-    return data;
+    const merged = { ...udetails, ...data };
+    setUdetails(merged);
+    return merged;
   };
 
-  const validateStep = (data) => {
+  const validateStep = (d) => {
     const newErrors = {};
-    const d = { ...udetails, ...data }; // merged active view
-    
     if (step === 1) {
       if (!d.createdBy) newErrors.createdBy = 'Required';
       if (!d.name || !d.name.trim()) newErrors.name = 'Required';
@@ -85,7 +80,7 @@ const Signup = () => {
 
   const prevStep = (e) => {
     e.preventDefault();
-    saveCurrentStepData(); // save whatever they typed so far if they go back
+    saveCurrentStepData(); 
     setErrors({});
     setStep(s => s - 1);
     window.scrollTo(0, 0);
@@ -98,10 +93,8 @@ const Signup = () => {
     if (!validateStep(currentData)) return;
     
     setLoading(true);
-    const finalPayload = { ...udetails, ...currentData };
-    
     try {
-      const { data } = await axios.post(`${API}/auth/page1/createuser`, finalPayload, {
+      const { data } = await axios.post(`${API}/auth/page1/createuser`, currentData, {
         headers: { 'Content-Type': 'application/json' }
       });
       if (data.success) {
@@ -124,229 +117,223 @@ const Signup = () => {
     setLoading(false);
   };
 
+  // Used for manual radio pills so we can see the selection easily
+  const forceUpdateObj = (key, val) => {
+    setUdetails(prev => ({ ...prev, [key]: val }));
+    if (errors[key]) setErrors(prev => ({ ...prev, [key]: null }));
+  };
+
   return (
     <>
       <Navbar />
-      <div className="sp-page-native">
-        {/* We use an absolute background to avoid iOS Safari 'fixed' repainting bugs causing keyboard drop */}
-        <div className="sp-bg-img" style={{ backgroundImage: `url('${BG}')` }} />
-        <div className="sp-overlay" />
-        
-        <div className="sp-content">
-          <div className="sp-hero">
-            <img src={logo} alt="Saanjh" className="sp-logo" />
-            <h1 className="sp-title">Join Saanjh Matrimony</h1>
-            <p className="sp-subtitle">Find your perfect match — step by step</p>
+      
+      <div className="mobile-safe-page">
+        <div className="mobile-safe-card">
+          <div className="ms-header">
+            <img src={logo} alt="Saanjh" className="ms-logo" />
+            <h1 className="ms-title">Sign Up</h1>
+            <p className="ms-subtitle">Find your perfect match.</p>
           </div>
 
-          <div className="sp-progress-wrap">
-            <div className={`sp-step-dot ${step >= 1 ? 'active' : ''} ${step === 1 ? 'current' : ''}`}>
-              <div className="sp-step-num">1</div>
-              <div className="sp-step-label">ACCOUNT</div>
-            </div>
-            <div className={`sp-connector ${step >= 2 ? 'done' : ''}`} />
-            
-            <div className={`sp-step-dot ${step >= 2 ? 'active' : ''} ${step === 2 ? 'current' : ''}`}>
-              <div className="sp-step-num">2</div>
-              <div className="sp-step-label">PERSONAL</div>
-            </div>
-            <div className={`sp-connector ${step >= 3 ? 'done' : ''}`} />
+          <div className="ms-progress">STEP {step} OF 4</div>
 
-            <div className={`sp-step-dot ${step >= 3 ? 'active' : ''} ${step === 3 ? 'current' : ''}`}>
-              <div className="sp-step-num">3</div>
-              <div className="sp-step-label">BACKGROUND</div>
-            </div>
-            <div className={`sp-connector ${step >= 4 ? 'done' : ''}`} />
+          {serverMsg && <div className="ms-server-error">⚠️ {serverMsg}</div>}
 
-            <div className={`sp-step-dot ${step >= 4 ? 'active' : ''} ${step === 4 ? 'current' : ''}`}>
-              <div className="sp-step-num">4</div>
-              <div className="sp-step-label">LIFESTYLE</div>
-            </div>
-          </div>
-
-          {serverMsg && (
-            <div className="sp-server-error">⚠️ {serverMsg}</div>
-          )}
-
-          <form ref={formRef} onSubmit={step === 4 ? handleSubmit : nextStep} className="sp-form native-form">
+          <form ref={formRef} onSubmit={step === 4 ? handleSubmit : nextStep}>
             
             {/* STEP 1 */}
-            <div style={{ display: step === 1 ? 'block' : 'none' }} className="sp-step-section">
-              <h2 className="sp-step-title">Basic Account Setup</h2>
-              
-              <div className="sp-field">
-                <label className="sp-label">Profile Creating For</label>
-                <select name="createdBy" defaultValue={udetails.createdBy} className="sp-input">
-                  <option value="Self">Self</option>
-                  <option value="Son">Son</option>
-                  <option value="Daughter">Daughter</option>
-                  <option value="Brother">Brother</option>
-                  <option value="Sister">Sister</option>
-                  <option value="Friend">Friend</option>
-                  <option value="Relative">Relative</option>
-                </select>
-                {errors.createdBy && <span className="sp-error">{errors.createdBy}</span>}
+            <div style={{ display: step === 1 ? 'block' : 'none' }}>
+              <div className="ms-field">
+                <label className="ms-label">Creating Profile For</label>
+                <div className="ms-radio-group">
+                  {['Self', 'Son', 'Daughter', 'Brother', 'Sister', 'Relative'].map(opt => (
+                    <div 
+                      key={opt} 
+                      className={`ms-radio-pill ${udetails.createdBy === opt ? 'selected' : ''}`}
+                      onClick={() => forceUpdateObj('createdBy', opt)}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+                {/* Hidden input to satisfy FormData */}
+                <input type="hidden" name="createdBy" value={udetails.createdBy} />
+                {errors.createdBy && <span className="ms-error">{errors.createdBy}</span>}
               </div>
 
-              <div className="sp-grid-2">
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-n">Full Name</label>
-                  <input id="s-n" name="name" type="text" defaultValue={udetails.name} className="sp-input" placeholder="Your full name" />
-                  {errors.name && <span className="sp-error">{errors.name}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-e">Email Address</label>
-                  <input id="s-e" name="email" type="email" defaultValue={udetails.email} className="sp-input" placeholder="Email" readOnly={!!sessionStorage.getItem('verifiedEmail')} style={{ background: sessionStorage.getItem('verifiedEmail') ? 'rgba(255,255,255,0.4)' : '' }} />
-                  {errors.email && <span className="sp-error">{errors.email}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-p">Phone Number</label>
-                  <input id="s-p" name="phone" type="number" defaultValue={udetails.phone} className="sp-input" placeholder="10-digit mobile number" />
-                  {errors.phone && <span className="sp-error">{errors.phone}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-pwd">Password</label>
-                  <input id="s-pwd" name="password" type="password" defaultValue={udetails.password} className="sp-input" placeholder="Min 8 characters" />
-                  {errors.password && <span className="sp-error">{errors.password}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-cpwd">Confirm Password</label>
-                  <input id="s-cpwd" name="cpassword" type="password" defaultValue={udetails.cpassword} className="sp-input" placeholder="Re-enter password" />
-                  {errors.cpassword && <span className="sp-error">{errors.cpassword}</span>}
-                </div>
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-name">Full Name</label>
+                <input id="m-name" name="name" type="text" defaultValue={udetails.name} className="ms-input" placeholder="Your full name" autoComplete="off" />
+                {errors.name && <span className="ms-error">{errors.name}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-email">Email Address</label>
+                <input id="m-email" name="email" type="email" defaultValue={udetails.email} className="ms-input" placeholder="Email" autoComplete="off" readOnly={!!sessionStorage.getItem('verifiedEmail')} style={{ background: sessionStorage.getItem('verifiedEmail') ? '#e5e7eb' : '' }} />
+                {errors.email && <span className="ms-error">{errors.email}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-phone">Phone Number</label>
+                <input id="m-phone" name="phone" type="number" defaultValue={udetails.phone} className="ms-input" placeholder="10-digit mobile number" autoComplete="off" />
+                {errors.phone && <span className="ms-error">{errors.phone}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-pwd">Password</label>
+                <input id="m-pwd" name="password" type="password" defaultValue={udetails.password} className="ms-input" placeholder="Min 8 characters" autoComplete="off" />
+                {errors.password && <span className="ms-error">{errors.password}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-cpwd">Confirm Password</label>
+                <input id="m-cpwd" name="cpassword" type="password" defaultValue={udetails.cpassword} className="ms-input" placeholder="Re-enter password" autoComplete="off" />
+                {errors.cpassword && <span className="ms-error">{errors.cpassword}</span>}
               </div>
             </div>
 
             {/* STEP 2 */}
-            <div style={{ display: step === 2 ? 'block' : 'none' }} className="sp-step-section">
-              <h2 className="sp-step-title">Personal Details</h2>
-              <div className="sp-field">
-                <label className="sp-label">Gender</label>
-                <select name="gender" defaultValue={udetails.gender} className="sp-input">
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-                {errors.gender && <span className="sp-error">{errors.gender}</span>}
+            <div style={{ display: step === 2 ? 'block' : 'none' }}>
+              <div className="ms-field">
+                <label className="ms-label">Gender</label>
+                <div className="ms-radio-group">
+                  {['Male', 'Female'].map(opt => (
+                    <div 
+                      key={opt} 
+                      className={`ms-radio-pill ${udetails.gender === opt ? 'selected' : ''}`}
+                      onClick={() => forceUpdateObj('gender', opt)}
+                    >
+                      {opt}
+                    </div>
+                  ))}
+                </div>
+                <input type="hidden" name="gender" value={udetails.gender} />
+                {errors.gender && <span className="ms-error">{errors.gender}</span>}
               </div>
-              <div className="sp-grid-2">
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-age">Age</label>
-                  <input id="s-age" name="age" type="number" defaultValue={udetails.age} className="sp-input" placeholder="Your age" />
-                  {errors.age && <span className="sp-error">{errors.age}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-dob">Date of Birth</label>
-                  <input id="s-dob" name="dob" type="date" defaultValue={udetails.dob} className="sp-input" />
-                  {errors.dob && <span className="sp-error">{errors.dob}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-height">Height (cm)</label>
-                  <input id="s-height" name="height" type="number" defaultValue={udetails.height} className="sp-input" placeholder="e.g. 170" />
-                  {errors.height && <span className="sp-error">{errors.height}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-weight">Weight (kg)</label>
-                  <input id="s-weight" name="weight" type="number" defaultValue={udetails.weight} className="sp-input" placeholder="e.g. 65" />
-                  {errors.weight && <span className="sp-error">{errors.weight}</span>}
-                </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-age">Age</label>
+                <input id="m-age" name="age" type="number" defaultValue={udetails.age} className="ms-input" placeholder="Your age" autoComplete="off" />
+                {errors.age && <span className="ms-error">{errors.age}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-dob">Date of Birth</label>
+                <input id="m-dob" name="dob" type="date" defaultValue={udetails.dob} className="ms-input" />
+                {errors.dob && <span className="ms-error">{errors.dob}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-height">Height (cm)</label>
+                <input id="m-height" name="height" type="number" defaultValue={udetails.height} className="ms-input" placeholder="e.g. 170" autoComplete="off" />
+                {errors.height && <span className="ms-error">{errors.height}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-weight">Weight (kg)</label>
+                <input id="m-weight" name="weight" type="number" defaultValue={udetails.weight} className="ms-input" placeholder="e.g. 65" autoComplete="off" />
+                {errors.weight && <span className="ms-error">{errors.weight}</span>}
               </div>
             </div>
 
             {/* STEP 3 */}
-            <div style={{ display: step === 3 ? 'block' : 'none' }} className="sp-step-section">
-              <h2 className="sp-step-title">Background &amp; Location</h2>
-              <div className="sp-grid-2">
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-rel">Religion</label>
-                  <select id="s-rel" name="religion" defaultValue={udetails.religion} className="sp-input">
-                    <option value="">Select Religion</option>
-                    {['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Parsi', 'No Religion'].map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                  {errors.religion && <span className="sp-error">{errors.religion}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-caste">Caste</label>
-                  <input id="s-caste" name="caste" type="text" defaultValue={udetails.caste} className="sp-input" placeholder="Your caste" />
-                  {errors.caste && <span className="sp-error">{errors.caste}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-mot">Mother Tongue</label>
-                  <select id="s-mot" name="motherTongue" defaultValue={udetails.motherTongue} className="sp-input">
-                    <option value="">Select Tongue</option>
-                    {['Hindi', 'Punjabi', 'Marathi', 'Gujarati', 'Tamil', 'English'].map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                  {errors.motherTongue && <span className="sp-error">{errors.motherTongue}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-ms">Marital Status</label>
-                  <select id="s-ms" name="maritalStatus" defaultValue={udetails.maritalStatus} className="sp-input">
-                    {['Never Married', 'Awaiting Divorce', 'Divorced', 'Widowed'].map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                  {errors.maritalStatus && <span className="sp-error">{errors.maritalStatus}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-state">State</label>
-                  <select id="s-state" name="state" defaultValue={udetails.state} className="sp-input">
-                    <option value="">Select State</option>
-                    {['Bihar', 'Delhi', 'Maharashtra', 'Punjab', 'Karnataka', 'Gujarat', 'Rajasthan', 'Uttar Pradesh', 'Tamil Nadu', 'West Bengal'].map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  {errors.state && <span className="sp-error">{errors.state}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-dist">District / City</label>
-                  <input id="s-dist" name="district" type="text" defaultValue={udetails.district} className="sp-input" placeholder="Your city" />
-                  {errors.district && <span className="sp-error">{errors.district}</span>}
-                </div>
+            <div style={{ display: step === 3 ? 'block' : 'none' }}>
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-rel">Religion</label>
+                <select id="m-rel" name="religion" defaultValue={udetails.religion} className="ms-input ms-select">
+                  <option value="">Select Religion</option>
+                  {['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Parsi', 'No Religion'].map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+                {errors.religion && <span className="ms-error">{errors.religion}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-caste">Caste</label>
+                <input id="m-caste" name="caste" type="text" defaultValue={udetails.caste} className="ms-input" placeholder="Your caste" autoComplete="off" />
+                {errors.caste && <span className="ms-error">{errors.caste}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-mot">Mother Tongue</label>
+                <select id="m-mot" name="motherTongue" defaultValue={udetails.motherTongue} className="ms-input ms-select">
+                  <option value="">Select Tongue</option>
+                  {['Hindi', 'Punjabi', 'Marathi', 'Gujarati', 'Tamil', 'English', 'Other'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                {errors.motherTongue && <span className="ms-error">{errors.motherTongue}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-ms">Marital Status</label>
+                <select id="m-ms" name="maritalStatus" defaultValue={udetails.maritalStatus} className="ms-input ms-select">
+                  {['Never Married', 'Awaiting Divorce', 'Divorced', 'Widowed'].map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+                {errors.maritalStatus && <span className="ms-error">{errors.maritalStatus}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-state">State</label>
+                <select id="m-state" name="state" defaultValue={udetails.state} className="ms-input ms-select">
+                  <option value="">Select State</option>
+                  {['Bihar', 'Delhi', 'Maharashtra', 'Punjab', 'Karnataka', 'Gujarat', 'Rajasthan', 'Uttar Pradesh', 'Tamil Nadu', 'West Bengal'].map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+                {errors.state && <span className="ms-error">{errors.state}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-dist">District / City</label>
+                <input id="m-dist" name="district" type="text" defaultValue={udetails.district} className="ms-input" placeholder="Your city" autoComplete="off" />
+                {errors.district && <span className="ms-error">{errors.district}</span>}
               </div>
             </div>
 
             {/* STEP 4 */}
-            <div style={{ display: step === 4 ? 'block' : 'none' }} className="sp-step-section">
-              <h2 className="sp-step-title">Education &amp; Lifestyle</h2>
-              <div className="sp-grid-2">
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-ed">Highest Education</label>
-                  <select id="s-ed" name="education" defaultValue={udetails.education} className="sp-input">
-                    <option value="">Select</option>
-                    {['BTech/BE', 'MBA', 'MTech', 'BCA', 'MCA', 'MBBS', 'BCom', 'BA', 'High School', 'Other'].map(e => <option key={e} value={e}>{e}</option>)}
-                  </select>
-                  {errors.education && <span className="sp-error">{errors.education}</span>}
-                </div>
-                <div className="sp-field">
-                  <label className="sp-label" htmlFor="s-work">Working Sector</label>
-                  <select id="s-work" name="working" defaultValue={udetails.working} className="sp-input">
-                    <option value="">Select</option>
-                    {['Private Sector', 'Govt Sector', 'Business/Self Employed', 'Defense', 'Not Working'].map(w => <option key={w} value={w}>{w}</option>)}
-                  </select>
-                  {errors.working && <span className="sp-error">{errors.working}</span>}
-                </div>
+            <div style={{ display: step === 4 ? 'block' : 'none' }}>
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-ed">Highest Education</label>
+                <select id="m-ed" name="education" defaultValue={udetails.education} className="ms-input ms-select">
+                  <option value="">Select</option>
+                  {['BTech/BE', 'MBA', 'MTech', 'BCA', 'MCA', 'MBBS', 'BCom', 'BA', 'High School', 'Other'].map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+                {errors.education && <span className="ms-error">{errors.education}</span>}
               </div>
-              <div className="sp-field">
-                <label className="sp-label" htmlFor="s-desc">About Me</label>
-                <textarea id="s-desc" name="description" defaultValue={udetails.description} placeholder="Share a bit about yourself... (min 30 characters)" className="sp-input sp-textarea" rows={4} />
-                <small className="sp-note">⚠️ Do not share mobile numbers or social links — they will be removed.</small>
-                {errors.description && <span className="sp-error">{errors.description}</span>}
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-work">Working Sector</label>
+                <select id="m-work" name="working" defaultValue={udetails.working} className="ms-input ms-select">
+                  <option value="">Select</option>
+                  {['Private Sector', 'Govt Sector', 'Business/Self Employed', 'Defense', 'Not Working'].map(w => <option key={w} value={w}>{w}</option>)}
+                </select>
+                {errors.working && <span className="ms-error">{errors.working}</span>}
               </div>
-              <div className="sp-field">
-                <label className="sp-label" htmlFor="s-ppref">Partner Preferences</label>
-                <textarea id="s-ppref" name="partnerPreference" defaultValue={udetails.partnerPreference} placeholder="What are you looking for in a partner?" className="sp-input sp-textarea" rows={4} />
-                {errors.partnerPreference && <span className="sp-error">{errors.partnerPreference}</span>}
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-desc">About Me</label>
+                <textarea id="m-desc" name="description" defaultValue={udetails.description} placeholder="Share a bit about yourself... (min 30 characters)" className="ms-input ms-textarea" rows={4} autoComplete="off" />
+                <span style={{fontSize: '11px', color: '#888', marginTop: '4px'}}>⚠️ No numbers or links allowed.</span>
+                {errors.description && <span className="ms-error">{errors.description}</span>}
+              </div>
+
+              <div className="ms-field">
+                <label className="ms-label" htmlFor="m-ppref">Partner Preferences</label>
+                <textarea id="m-ppref" name="partnerPreference" defaultValue={udetails.partnerPreference} placeholder="What are you looking for in a partner?" className="ms-input ms-textarea" rows={4} autoComplete="off" />
+                {errors.partnerPreference && <span className="ms-error">{errors.partnerPreference}</span>}
               </div>
             </div>
 
-            <div className="sp-nav-buttons">
-              {step > 1 
-                ? <button type="button" onClick={prevStep} className="sp-btn-back">← Back</button>
-                : <span />
-              }
-              {step < 4
-                ? <button type="submit" className="sp-btn-next">Continue →</button>
-                : <button type="submit" className="sp-btn-submit" disabled={loading}>
-                    {loading ? 'Registering...' : '✓ Complete Registration'}
-                  </button>
-              }
+            <div className="ms-buttons">
+              {step < 4 ? (
+                <button type="submit" className="ms-btn-primary">Continue</button>
+              ) : (
+                <button type="submit" className="ms-btn-primary" disabled={loading}>
+                  {loading ? 'Registering...' : 'Register'}
+                </button>
+              )}
+
+              {step > 1 && (
+                <button type="button" onClick={prevStep} className="ms-btn-secondary">Back</button>
+              )}
             </div>
+            
           </form>
         </div>
       </div>
