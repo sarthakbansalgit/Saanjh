@@ -1,193 +1,180 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Heart, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import API from '../api';
-import './Signup.css';
 
-const registerSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Please enter a valid phone number'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
-
-export default function RegisterPage() {
+export default function Signup() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [serverMsg, setServerMsg] = useState('');
-
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm({
-    resolver: zodResolver(registerSchema),
+  const [formData, setFormData] = useState({
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Preserve the data if passed from previous verification step
-    const verifiedEmail = sessionStorage.getItem('verifiedEmail');
-    if (verifiedEmail) {
-      setValue('email', verifiedEmail);
-    }
-    const tempPhone = sessionStorage.getItem('tempPhone');
-    if (tempPhone) {
-      setValue('phone', tempPhone);
-    }
-    const tempPassword = sessionStorage.getItem('tempPassword');
-    if (tempPassword) {
-      setValue('password', tempPassword);
-      setValue('confirmPassword', tempPassword);
-    }
-  }, [setValue]);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const onSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setIsLoading(true);
-    setServerMsg('');
-    try {
-      const response = await axios.post(`${API}/auth/page1/createuser`, {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        password: data.password,
-        createdBy: 'Self'
-      }, {
-        headers: { 'Content-Type': 'application/json' }
-      });
 
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.authToken);
-        window.alert('Successfully Registered! You are now logged in.');
-        window.location.replace(window.location.pathname + '#/');
-        window.location.reload();
+    try {
+      // By default Mongoose schema requires name, age, and gender.
+      // Since this is a simple signup, we securely inject placeholders 
+      // that the user can update in their dashboard later.
+      const payload = {
+        name: "New User", 
+        age: "18", 
+        gender: "Not Specified",
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password
+      };
+
+      const res = await axios.post(`${API}/auth/page1/createuser`, payload);
+
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.authToken);
+        navigate('/'); // Redirect to home or dashboard after successful simple login
       } else {
-        setServerMsg(response.data.error || 'Validation error');
+        setError(res.data.error || 'Registration failed');
       }
     } catch (err) {
-      if (err.response?.data?.errors) {
-        setServerMsg(err.response.data.errors.map((e) => e.msg).join(', '));
-      } else if (err.response?.data?.error) {
-        setServerMsg(err.response.data.error);
-      } else {
-        setServerMsg('Server error. Please check connection.');
-      }
+      setError(err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Server Error');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="signup-min-h-screen">
-      {/* Background decorations */}
-      <div className="signup-bg-decor top-decor" />
-      <div className="signup-bg-decor bottom-decor" />
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#fcf0f4' }}>
+      <div 
+        className="w-full max-w-md p-8 md:p-10 relative" 
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 10px 40px rgba(168, 60, 116, 0.08)'
+        }}
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2 text-[#2a1a20]" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Create Your Account
+          </h1>
+          <p className="text-[#88787f]" style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem' }}>
+            Start your journey to finding love
+          </p>
+        </div>
 
-      <div className="signup-form-wrapper">
-        {/* Logo */}
-        <Link to="/" className="signup-logo-link">
-          <div className="signup-logo-icon">
-            <Heart size={24} color="#fff" fill="#fff" />
+        {error && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-center text-sm">
+            {error}
           </div>
-          <span className="signup-logo-text">Saanjh</span>
-        </Link>
+        )}
 
-        {/* Register Card */}
-        <div className="signup-glass-card">
-          <div className="text-center signup-header-text">
-            <h1 className="signup-title">Create Your Account</h1>
-            <p className="signup-subtitle">Start your journey to finding love</p>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <label className="block text-[#2a1a20] font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your@email.com"
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#b83b7e] focus:ring-1 focus:ring-[#b83b7e] outline-none transition-colors"
+              style={{ backgroundColor: '#fafafa', color: '#4a4a4a' }}
+            />
           </div>
 
-          {serverMsg && <div className="signup-server-error">⚠️ {serverMsg}</div>}
+          <div className="space-y-2">
+            <label className="block text-[#2a1a20] font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+91 9876543210"
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#b83b7e] focus:ring-1 focus:ring-[#b83b7e] outline-none transition-colors"
+              style={{ backgroundColor: '#fafafa', color: '#4a4a4a' }}
+            />
+          </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="signup-form">
-            <div className="signup-field">
-              <label>Full Name</label>
+          <div className="space-y-2">
+            <label className="block text-[#2a1a20] font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Password
+            </label>
+            <div className="relative">
               <input
-                type="text"
-                placeholder="John Doe"
-                className="signup-input"
-                autoComplete="off"
-                {...register('name')}
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Min. 8 characters"
+                required
+                minLength={8}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#b83b7e] focus:ring-1 focus:ring-[#b83b7e] outline-none transition-colors pr-12"
+                style={{ backgroundColor: '#fafafa', color: '#4a4a4a' }}
               />
-              {errors.name && <p className="signup-error">{errors.name.message}</p>}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
+          </div>
 
-            <div className="signup-field">
-              <label>Email Address</label>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="signup-input"
-                autoComplete="off"
-                {...register('email')}
-              />
-              {errors.email && <p className="signup-error">{errors.email.message}</p>}
-            </div>
+          <div className="space-y-2">
+            <label className="block text-[#2a1a20] font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              required
+              minLength={8}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#b83b7e] focus:ring-1 focus:ring-[#b83b7e] outline-none transition-colors"
+              style={{ backgroundColor: '#fafafa', color: '#4a4a4a' }}
+            />
+          </div>
 
-            <div className="signup-field">
-              <label>Phone Number</label>
-              <input
-                type="tel"
-                placeholder="10-digit number"
-                className="signup-input"
-                autoComplete="off"
-                {...register('phone')}
-              />
-              {errors.phone && <p className="signup-error">{errors.phone.message}</p>}
-            </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all hover:opacity-90 mt-2"
+            style={{ backgroundColor: '#b83b7e' }}
+          >
+            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {!isLoading && <ArrowRight size={18} />}
+          </button>
+        </form>
 
-            <div className="signup-field">
-              <label>Password</label>
-              <div className="pwd-input-wrapper">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Min. 8 characters"
-                  className="signup-input"
-                  autoComplete="off"
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  className="pwd-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.password && <p className="signup-error">{errors.password.message}</p>}
-            </div>
-
-            <div className="signup-field">
-              <label>Confirm Password</label>
-              <input
-                type="password"
-                placeholder="Confirm your password"
-                className="signup-input"
-                autoComplete="off"
-                {...register('confirmPassword')}
-              />
-              {errors.confirmPassword && <p className="signup-error">{errors.confirmPassword.message}</p>}
-            </div>
-
-            <button 
-              type="submit" 
-              className="signup-submit-btn"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
-              <ArrowRight size={18} />
-            </button>
-          </form>
-
-          <p className="signup-footer-text">
+        <div className="text-center mt-8">
+          <p className="text-[#88787f]" style={{ fontFamily: "'Playfair Display', serif" }}>
             Already have an account?{' '}
-            <Link to="/login" className="signup-signin-link">
+            <Link to="/login" className="font-semibold transition-colors" style={{ color: '#b83b7e', textDecoration: 'none' }}>
               Sign In
             </Link>
           </p>

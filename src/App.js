@@ -49,9 +49,7 @@ function App() {
 
         {/* ── Public routes ── */}
         <Route path="/" element={<Frontend title="Saanjh" />} />
-        <Route path="/signup" element={<EmailAuth />} />
-        <Route path="/verify" element={<VerifyPage />} />
-        <Route path="/create-profile" element={<Signup />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/forget-password" element={<Forget />} />
