@@ -18,7 +18,7 @@ import Forget from './components/Forget';
 import Reset from './components/Reset';
 import Pricing from './components/Pricing';
 import EmailAuth from './components/EmailAuth';
-
+import VerifyPage from './components/VerifyPage';
 
 function App() {
   const user = localStorage.getItem("token");
@@ -50,6 +50,7 @@ function App() {
         {/* ── Public routes ── */}
         <Route path="/" element={<Frontend title="Saanjh" />} />
         <Route path="/signup" element={<EmailAuth />} />
+        <Route path="/verify" element={<VerifyPage />} />
         <Route path="/create-profile" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />

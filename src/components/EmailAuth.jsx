@@ -1,193 +1,176 @@
-import API from '../api';
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import logo from '../saanjh-logo.jpg';
-import Navbar from './fcomponents/Navbar';
-import Footer from './fcomponents/Footer';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Heart, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { useAuth } from '../hooks/use-auth'
 
-const EmailAuth = () => {
-    const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('');
-    const [otpSent, setOtpSent] = useState(false);
-    const [timer, setTimer] = useState(60);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+const registerSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Please enter a valid phone number'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+})
 
-    const navigate = useNavigate();
+export default function RegisterPage() {
+  const navigate = useNavigate()
+  const { register: registerUser } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [serverError, setServerError] = useState("")
 
-    useEffect(() => {
-        let interval;
-        if (otpSent && timer > 0) {
-            interval = setInterval(() => {
-                setTimer((prev) => prev - 1);
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [otpSent, timer]);
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(registerSchema),
+  })
 
-    const handleSendOtp = async (e) => {
-        e?.preventDefault();
+  const onSubmit = async (data) => {
+    setIsLoading(true)
+    setServerError("")
+    try {
+      // Store phone & password to auto-fill main profile creation after OTP is done
+      sessionStorage.setItem('tempPhone', data.phone)
+      sessionStorage.setItem('tempPassword', data.password)
 
-        // Basic email regex prefix check
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email.trim() || !emailRegex.test(email)) {
-            setError("Please enter a valid email address.");
-            return;
-        }
+      const result = await registerUser(data.email, data.password, data.phone)
+      
+      // Navigate to OTP verification safely in React Router
+      navigate(`/verify?email=${encodeURIComponent(data.email)}`)
+    } catch (error) {
+      setServerError(error instanceof Error ? error.message : 'Registration failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-        setError('');
-        setLoading(true);
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 relative" style={{ backgroundColor: 'var(--background-pink)' }}>
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(255, 107, 158, 0.2)' }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(251, 111, 146, 0.2)' }} />
+      </div>
 
-        try {
-            const res = await axios.post(`${API}/auth/send-otp`, { email });
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo */}
+        <Link to="/" className="flex items-center justify-center gap-2 mb-8 no-underline">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--primary-pink)' }}>
+            <Heart className="w-6 h-6 text-white fill-white" />
+          </div>
+          <span className="text-2xl font-bold" style={{ 
+            background: 'linear-gradient(45deg, var(--deep-pink), var(--primary-pink))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontFamily: "'Playfair Display', serif"
+          }}>Saanjh</span>
+        </Link>
 
-            if (res.data.success) {
-                setOtpSent(true);
-                setTimer(60);
-                setLoading(false);
-            } else {
-                setError(res.data.error || "Failed to send OTP.");
-                setLoading(false);
-            }
-        } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.error || "Failed to send OTP. Please try again.");
-            setLoading(false);
-        }
-    };
+        {/* Register Card */}
+        <div className="p-6 md:p-8" style={{
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          borderRadius: '1.5rem',
+          boxShadow: '0 10px 40px rgba(251, 111, 146, 0.15)'
+        }}>
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold mb-2 text-[#4a0e26]">Create Your Account</h1>
+            <p className="text-gray-500">Start your journey to finding love</p>
+          </div>
 
-    const handleVerifyOtp = async (e) => {
-        e.preventDefault();
-        if (otp.length !== 6) {
-            setError("Please enter a 6-digit OTP.");
-            return;
-        }
+          {serverError && <p className="text-sm bg-red-100 text-red-600 p-2 rounded text-center mb-4">{serverError}</p>}
 
-        setLoading(true);
-        try {
-            const res = await axios.post(`${API}/auth/verify-otp`, { email, otp });
-
-            if (res.data.success) {
-                // Save verified email
-                sessionStorage.setItem("verifiedEmail", email);
-                navigate('/create-profile');
-            } else {
-                setError(res.data.error || "Invalid OTP.");
-                setLoading(false);
-            }
-        } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.error || "Invalid OTP. Please try again.");
-            setLoading(false);
-        }
-    };
-
-    return (
-        <>
-            <Navbar />
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh", width: "100vw", background: `url('${process.env.PUBLIC_URL}/bg.jpeg') center/cover no-repeat fixed`, marginLeft: "calc(-50vw + 50%)" }}>
-
-                <div className="wrapper" style={{ margin: "10px auto" }}>
-                    <div style={{ borderRadius: "25px", overflow: "hidden" }}>
-
-                        {/* Header */}
-                        <div className="text-center py-4" style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white" }}>
-                            <img src={logo} alt="Saanjh" style={{ height: "75px", objectFit: "contain", marginBottom: "10px", filter: "brightness(1.05)" }} />
-                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: "bold", margin: 0 }}>Register</h2>
-                            <p className="mb-0 mt-1" style={{ opacity: 0.85 }}>Verify your email to continue</p>
-                        </div>
-
-                        <div className="p-3 p-md-5">
-                            {error && (
-                                <div className="alert alert-danger text-center" style={{ borderRadius: "12px", fontSize: "14px" }}>
-                                    {error}
-                                </div>
-                            )}
-
-                            {!otpSent ? (
-                                <form onSubmit={handleSendOtp}>
-                                    <div className="mb-4">
-                                        <label style={{ fontWeight: "600", color: "#333", marginBottom: "8px", display: "block" }}>Email Address</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text" style={{ background: "#f8f9fa", border: "1.5px solid #ddd", borderRight: "none", color: "#333" }}>
-                                                <i className="fa-solid fa-envelope"></i>
-                                            </span>
-                                            <input
-                                                type="email"
-                                                className="form-control"
-                                                placeholder="Enter your email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value.toLowerCase())}
-                                                style={{ border: "1.5px solid #ddd", borderLeft: "none", padding: "12px", color: "#333", fontWeight: "600" }}
-                                            />
-                                        </div>
-                                    </div>
-
-
-
-                                    <button
-                                        type="submit"
-                                        className="btn w-100"
-                                        disabled={!email || loading}
-                                        style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white", borderRadius: "25px", padding: "13px", fontWeight: "bold", border: "none", opacity: (!email || loading) ? 0.6 : 1, position: "relative" }}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Sending...
-                                            </>
-                                        ) : "Send OTP"}
-                                    </button>
-                                </form>
-                            ) : (
-                                <form onSubmit={handleVerifyOtp}>
-                                    <div className="mb-4">
-                                        <label style={{ fontWeight: "600", color: "#333", marginBottom: "8px", display: "block", textAlign: "center" }}>Enter 6-digit OTP sent to<br /><strong style={{ color: "var(--deep-pink)" }}>{email}</strong></label>
-
-                                        <input
-                                            type="text"
-                                            maxLength="6"
-                                            className="form-control text-center mt-3"
-                                            placeholder="• • • • • •"
-                                            value={otp}
-                                            onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                                            style={{ border: "1.5px solid #ddd", padding: "12px", fontSize: "24px", letterSpacing: "8px", color: "#333", fontWeight: "bold" }}
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        className="btn w-100 mb-3"
-                                        disabled={otp.length !== 6 || loading}
-                                        style={{ background: "linear-gradient(135deg, var(--primary-pink), var(--deep-pink))", color: "white", borderRadius: "25px", padding: "13px", fontWeight: "bold", border: "none", opacity: (otp.length !== 6 || loading) ? 0.6 : 1 }}
-                                    >
-                                        {loading ? "Verifying..." : "Verify OTP"}
-                                    </button>
-
-                                    <div className="text-center mt-3">
-                                        {timer > 0 ? (
-                                            <span style={{ color: "#666", fontSize: "14px" }}>Resend OTP in <b>{timer}s</b></span>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={handleSendOtp}
-                                                disabled={loading}
-                                                style={{ background: "none", border: "none", color: "var(--deep-pink)", fontWeight: "bold", textDecoration: "underline", fontSize: "14px" }}
-                                            >
-                                                Resend OTP
-                                            </button>
-                                        )}
-                                    </div>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-                </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2 text-left">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                className="bg-white/70"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+              )}
             </div>
-            <Footer />
-        </>
-    );
-};
 
-export default EmailAuth;
+            <div className="space-y-2 text-left">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+91 9876543210"
+                className="bg-white/70"
+                {...register('phone')}
+              />
+              {errors.phone && (
+                <p className="text-sm text-red-500 mt-1">{errors.phone.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 text-left">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Min. 8 characters"
+                  className="bg-white/70 pr-10"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2 text-left">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                className="bg-white/70"
+                {...register('confirmPassword')}
+              />
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500 mt-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full mt-2"
+              disabled={isLoading}
+              style={{ backgroundColor: 'var(--primary-pink)' }}
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6 md:mb-0">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium no-underline" style={{ color: 'var(--primary-pink)' }}>
+              Sign In
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
